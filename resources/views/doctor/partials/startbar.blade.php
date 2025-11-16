@@ -1,6 +1,6 @@
 <div class="startbar doctor-startbar d-print-none">
     <div class="brand">
-        <a href="{{ route('doctor.portal.dashboard') }}" class="logo">
+        <a href="{{ route('doctor.portal.dashboard') }}" class="logo">cyber
             <span><img src="{{ asset('rizz-assets/images/logo-sm.png') }}" class="logo-sm" alt="logo-small"></span>
             <span>
                 <img src="{{ asset('rizz-assets/images/logo-light.png') }}" class="logo-lg logo-light" alt="logo-light">
