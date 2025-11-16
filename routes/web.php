@@ -6,8 +6,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\NursingController;
+use App\Http\Controllers\DoctorPortalController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientPortalController;
+use App\Http\Controllers\PharmacyPortalController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\PortalAuthController;
 use App\Http\Controllers\TheatreController;
@@ -89,4 +91,12 @@ Route::middleware('guest')->group(function () use ($portalSlugs) {
 
 Route::middleware(['auth', 'portal:patient'])->prefix('patient-portal')->name('patient.portal.')->group(function () {
     Route::get('/dashboard', [PatientPortalController::class, 'dashboard'])->name('dashboard');
+});
+
+Route::middleware(['auth', 'portal:doctor'])->prefix('doctor-portal')->name('doctor.portal.')->group(function () {
+    Route::get('/dashboard', [DoctorPortalController::class, 'dashboard'])->name('dashboard');
+});
+
+Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy-portal')->name('pharmacy.portal.')->group(function () {
+    Route::get('/dashboard', [PharmacyPortalController::class, 'dashboard'])->name('dashboard');
 });

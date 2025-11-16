@@ -70,6 +70,8 @@ class PortalAuthController extends Controller
     {
         return match ($portal) {
             'patient' => 'patient.portal.dashboard',
+            'doctor' => 'doctor.portal.dashboard',
+            'pharmacy' => 'pharmacy.portal.dashboard',
             default => 'dashboard',
         };
     }
