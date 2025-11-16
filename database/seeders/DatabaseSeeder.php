@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +17,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            DepartmentSeeder::class,
+            ServiceSeeder::class,
+            PatientSeeder::class,
+            HmsDemoSeeder::class,
         ]);
+
+        foreach (config('hms.portals', []) as $slug => $portal) {
+            $attributes = [
+                'name' => $portal['label'],
+                'password' => Hash::make('123456'),
+                'role' => $slug,
+            ];
+
+            if ($slug === 'patient') {
+                $patientRecord = Patient::where('email', 'patient@hms.com')->first();
+                if ($patientRecord) {
+                    $attributes['patient_id'] = $patientRecord->id;
+                }
+            }
+
+            User::updateOrCreate(
+                ['email' => "{$slug}@hms.com"],
+                $attributes
+            );
+        }
     }
 }

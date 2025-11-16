@@ -31,6 +31,7 @@ class Patient extends Model
         'emergency_contact_name',
         'emergency_contact_phone',
         'wallet_minimum_balance',
+        'photo_url',
     ];
 
     protected $casts = [
@@ -57,6 +58,11 @@ class Patient extends Model
     public function visits()
     {
         return $this->hasMany(Visit::class);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 
     public function getFullNameAttribute(): string

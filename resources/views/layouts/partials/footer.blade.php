@@ -5,9 +5,9 @@
                 <div class="card mb-0 rounded-bottom-0">
                     <div class="card-body">
                         <p class="text-muted mb-0">
-                            &copy; <span id="current-year">{{ date('Y') }}</span> Rizz
+                            &copy; <span id="current-year">{{ date('Y') }}</span> All rights reserved.
                             <span class="text-muted d-none d-sm-inline-block float-end">
-                                Crafted with <i class="iconoir-heart text-danger"></i> by Mannatthemes
+                                Developed by <i class="iconoir-heart text-danger"></i> CyberHausa
                             </span>
                         </p>
                     </div>

@@ -84,9 +84,15 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <p class="mb-0 fw-semibold">{{ $prescription->drug_name }}</p>
-                                    <small class="text-muted">{{ $prescription->dosage }} · {{ $prescription->frequency }} · {{ $prescription->duration }}</small>
+                                    <small class="text-muted d-block">{{ $prescription->dosage }} · {{ $prescription->frequency }} · {{ $prescription->duration }}</small>
+                                    <small class="text-muted">Qty: {{ $prescription->quantity }} · Cost: ₦{{ number_format($prescription->total_cost, 2) }}</small>
                                 </div>
-                                <span class="badge bg-secondary-subtle text-capitalize">{{ $prescription->status }}</span>
+                                <div class="text-end">
+                                    <span class="badge bg-secondary-subtle text-capitalize">{{ $prescription->status }}</span>
+                                    @if($prescription->dispensed_at)
+                                        <p class="mb-0 mt-1 text-muted small">Dispensed {{ $prescription->dispensed_at->format('d M, h:ia') }}</p>
+                                    @endif
+                                </div>
                             </li>
                         @empty
                             <li class="list-group-item text-muted">No prescriptions added.</li>
@@ -105,9 +111,15 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <p class="mb-0 fw-semibold">{{ $test->test_name }}</p>
-                                    <small class="text-muted">{{ $test->result_summary ?? 'Awaiting result' }}</small>
+                                    <small class="text-muted d-block">{{ $test->result_summary ?? 'Awaiting result' }}</small>
+                                    <small class="text-muted">Technician: {{ $test->technician_name ?? 'Unassigned' }} · Charge: ₦{{ number_format($test->charge_amount, 2) }}</small>
                                 </div>
-                                <span class="badge bg-warning-subtle text-capitalize">{{ $test->status }}</span>
+                                <div class="text-end">
+                                        <span class="badge bg-warning-subtle text-capitalize">{{ str_replace('_', ' ', $test->status) }}</span>
+                                        @if($test->result_at)
+                                            <p class="mb-0 mt-1 text-muted small">Result {{ $test->result_at->format('d M, h:ia') }}</p>
+                                        @endif
+                                </div>
                             </li>
                         @empty
                             <li class="list-group-item text-muted">No lab orders.</li>

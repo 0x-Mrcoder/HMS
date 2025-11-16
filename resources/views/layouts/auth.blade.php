@@ -12,6 +12,8 @@
     <link href="{{ asset('rizz-assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('rizz-assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('rizz-assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@7.7.0/css/iconoir.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     @stack('styles')
 </head>
 

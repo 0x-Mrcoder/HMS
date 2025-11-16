@@ -1,3 +1,4 @@
+@php($user = auth()->user())
 <div class="topbar d-print-none">
     <div class="container-xxl">
         <nav class="topbar-custom d-flex justify-content-between" id="topbar-custom">
@@ -8,7 +9,7 @@
                     </button>
                 </li>
                 <li class="mx-3 welcome-text">
-                    <h3 class="mb-0 fw-bold text-truncate">Good Morning, James!</h3>
+                    <h3 class="mb-0 fw-bold text-truncate">Welcome back, {{ $user?->name ?? 'Admin' }}!</h3>
                 </li>
             </ul>
             <ul class="topbar-item list-unstyled d-inline-flex align-items-center mb-0">
@@ -147,8 +148,8 @@
                             </div>
                             <div class="d-sm-flex d-none ms-2">
                                 <div class="flex-grow-1">
-                                    <h6 class="fw-semibold fs-14 mb-0">James</h6>
-                                    <small class="text-muted fw-medium">Admin</small>
+                                    <h6 class="fw-semibold fs-14 mb-0">{{ $user?->name }}</h6>
+                                    <small class="text-muted fw-medium">{{ $user?->email }}</small>
                                 </div>
                                 <div class="ms-2 align-self-center">
                                     <i class="iconoir-nav-arrow-down text-muted fs-18"></i>
@@ -162,14 +163,19 @@
                                 <img src="{{ asset('rizz-assets/images/users/user-4.jpg') }}" alt="profile" class="thumb-lg rounded-circle">
                             </span>
                             <p class="mb-0 fs-14 fw-semibold">James Warner</p>
-                            <small class="text-muted">James@example.com</small>
+                            <small class="text-muted">{{ $user?->email }}</small>
                         </div>
                         <a class="dropdown-item" href="javascript:void(0);"><i class="bi bi-person fs-18 align-text-bottom me-2"></i> Profile</a>
                         <a class="dropdown-item" href="javascript:void(0);"><i class="bi bi-chat-left-text fs-18 align-text-bottom me-2"></i> Messages</a>
                         <a class="dropdown-item" href="javascript:void(0);"><i class="bi bi-gear fs-18 align-text-bottom me-2"></i> Settings</a>
                         <a class="dropdown-item" href="javascript:void(0);"><i class="bi bi-lock fs-18 align-text-bottom me-2"></i> Lock screen</a>
                         <div class="dropdown-divider mb-0"></div>
-                        <a class="dropdown-item" href="{{ route('login') }}"><i class="bi bi-box-arrow-right fs-18 align-text-bottom me-2"></i> Logout</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right fs-18 align-text-bottom me-2"></i> Logout
+                            </button>
+                        </form>
                     </div>
                 </li>
             </ul>

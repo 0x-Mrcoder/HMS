@@ -44,6 +44,36 @@
     </div>
 
     <div class="row g-3 mt-1">
+        <div class="col-md-4">
+            <div class="card mini-widget">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Scheduled Surgeries</p>
+                    <h3 class="mb-0">{{ number_format($metrics['scheduled_surgeries']) }}</h3>
+                    <span class="badge bg-secondary-subtle text-secondary mt-2">Theatre</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mini-widget">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Insurance Claims Pending</p>
+                    <h3 class="mb-0">{{ number_format($metrics['pending_claims']) }}</h3>
+                    <span class="badge bg-info-subtle text-info mt-2">NHIS desk</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mini-widget">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Today's Income</p>
+                    <h3 class="mb-0">₦{{ number_format($metrics['daily_income'], 2) }}</h3>
+                    <span class="badge bg-success-subtle text-success mt-2">Accounts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -154,6 +184,77 @@
                             </li>
                         @empty
                             <li class="list-group-item text-center text-muted">No wallet movement yet.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Theatre Queue</h5>
+                    <a href="{{ route('theatre.surgeries.index') }}" class="btn btn-soft-secondary btn-sm">Manage</a>
+                </div>
+                <div class="list-group list-group-flush">
+                    @forelse ($recentSurgeries as $surgery)
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0 fw-semibold">{{ $surgery->procedure_name }}</p>
+                                <small class="text-muted">{{ $surgery->patient->full_name }} · {{ $surgery->scheduled_at?->format('d M, h:ia') ?? 'TBD' }}</small>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-capitalize">{{ str_replace('_', ' ', $surgery->status) }}</span>
+                        </div>
+                    @empty
+                        <div class="list-group-item text-center text-muted">No surgical procedures logged.</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Insurance Pipeline</h5>
+                    <a href="{{ route('insurance.claims.index') }}" class="btn btn-soft-secondary btn-sm">All claims</a>
+                </div>
+                <div class="list-group list-group-flush">
+                    @forelse ($openClaims as $claim)
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0 fw-semibold">{{ $claim->patient->full_name }} · {{ $claim->policy_number }}</p>
+                                <small class="text-muted">{{ $claim->provider }} &middot; Submitted {{ $claim->submitted_at?->diffForHumans() ?? 'N/A' }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-secondary-subtle text-capitalize">{{ $claim->claim_status }}</span>
+                                <p class="mb-0 mt-1 fw-semibold">₦{{ number_format($claim->total_amount, 2) }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="list-group-item text-center text-muted">No claims awaiting approval.</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Collections by Channel</h5>
+                    <a href="{{ route('accounts.index') }}" class="btn btn-soft-secondary btn-sm">Accounts</a>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        @forelse ($channelSplit as $channel => $total)
+                            <li class="d-flex justify-content-between mb-1">
+                                <span class="text-uppercase">{{ $channel }}</span>
+                                <strong>₦{{ number_format($total, 2) }}</strong>
+                            </li>
+                        @empty
+                            <li class="text-muted text-center">No records captured.</li>
                         @endforelse
                     </ul>
                 </div>
