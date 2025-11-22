@@ -44,7 +44,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('patient.portal.labs') }}">
-                            <i class="iconoir-lab menu-icon"></i>
+                            <i class="iconoir-lab-flask menu-icon"></i>
                             <span>Lab Results</span>
                         </a>
                     </li>

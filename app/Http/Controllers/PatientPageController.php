@@ -96,6 +96,7 @@ class PatientPageController extends Controller
             'middle_name' => ['nullable', 'string', 'max:120'],
             'phone' => ['required', 'string', 'max:25'],
             'email' => ['nullable', 'email'],
+            'date_of_birth' => ['nullable', 'date'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:120'],
             'state' => ['nullable', 'string', 'max:120'],

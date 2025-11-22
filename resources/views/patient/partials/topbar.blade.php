@@ -1,4 +1,15 @@
-@php($patient = auth()->user()?->patient)
+@php
+    $patient = auth()->user()?->patient ?? $patient ?? null;
+    $photo = $patient?->photo_url;
+    $photoUrl = $photo
+        ? (\Illuminate\Support\Str::startsWith($photo, ['http://', 'https://'])
+            ? $photo
+            : asset(ltrim($photo, '/')))
+        : asset('rizz-assets/images/users/user-4.jpg');
+    $firstInitial = $patient?->first_name ? strtoupper(mb_substr($patient->first_name, 0, 1)) : '';
+    $lastInitial = $patient?->last_name ? strtoupper(mb_substr($patient->last_name, 0, 1)) : '';
+    $initials = trim($firstInitial . $lastInitial) ?: 'P';
+@endphp
 <div class="topbar d-print-none patient-topbar border-0 shadow-sm">
     <div class="container-xxl">
         <nav class="topbar-custom d-flex justify-content-between align-items-center py-2 px-2 px-md-0" id="patient-topbar">
@@ -14,7 +25,13 @@
             <div class="d-flex align-items-center gap-2 gap-md-3">
                 <div class="dropdown">
                     <a class="nav-link dropdown-toggle nav-user d-flex align-items-center px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ $patient?->photo_url ?? asset('rizz-assets/images/users/user-4.jpg') }}" alt="profile-user" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+                        <span class="rounded-circle me-2 d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary" style="width:40px;height:40px;font-weight:700; font-size:14px; position:relative; overflow:hidden;">
+                            @if($photo)
+                                <img src="{{ $photoUrl }}" alt="profile-user" class="w-100 h-100 rounded-circle" style="object-fit:cover; position:absolute; inset:0;">
+                            @else
+                                {{ $initials }}
+                            @endif
+                        </span>
                         <div class="d-none d-sm-block text-start">
                             <h6 class="fw-semibold fs-14 mb-0">{{ $patient?->full_name }}</h6>
                             <small class="text-muted">Patient</small>
@@ -23,7 +40,13 @@
                     <div class="dropdown-menu dropdown-menu-end">
                         <div class="dropdown-item text-center">
                             <span class="mb-2 d-inline-block">
-                                <img src="{{ $patient?->photo_url ?? asset('rizz-assets/images/users/user-4.jpg') }}" alt="profile" class="thumb-lg rounded-circle">
+                                <span class="thumb-lg rounded-circle d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary" style="width:64px;height:64px;font-weight:700; font-size:18px; position:relative; overflow:hidden;">
+                                    @if($photo)
+                                        <img src="{{ $photoUrl }}" alt="profile" class="w-100 h-100 rounded-circle" style="object-fit:cover; position:absolute; inset:0;">
+                                    @else
+                                        {{ $initials }}
+                                    @endif
+                                </span>
                             </span>
                             <p class="mb-0 fs-14 fw-semibold">{{ $patient?->full_name }}</p>
                             <small class="text-muted">{{ auth()->user()->email }}</small>

@@ -3,12 +3,29 @@
 @section('title', 'My Care Dashboard')
 
 @section('content')
+@php
+    $photo = $patient->photo_url;
+    $photoUrl = $photo
+        ? (\Illuminate\Support\Str::startsWith($photo, ['http://', 'https://'])
+            ? $photo
+            : asset(ltrim($photo, '/')))
+        : asset('rizz-assets/images/users/user-4.jpg');
+    $firstInitial = $patient->first_name ? strtoupper(mb_substr($patient->first_name, 0, 1)) : '';
+    $lastInitial = $patient->last_name ? strtoupper(mb_substr($patient->last_name, 0, 1)) : '';
+    $initials = trim($firstInitial . $lastInitial) ?: 'P';
+@endphp
 <div class="container-xxl py-4">
     <div class="row g-3" id="overview">
         <div class="col-lg-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <img src="{{ $patient->photo_url ?? asset('rizz-assets/images/users/user-4.jpg') }}" alt="patient photo" class="rounded-circle mb-3 shadow-sm" style="width:110px;height:110px;object-fit:cover;">
+                    <div class="rounded-circle mb-3 shadow-sm d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary" style="width:110px;height:110px;object-fit:cover; font-size:36px; font-weight:700; position:relative; overflow:hidden;">
+                        @if($photo)
+                            <img src="{{ $photoUrl }}" alt="patient photo" class="w-100 h-100 rounded-circle" style="object-fit:cover; position:absolute; inset:0;">
+                        @else
+                            {{ $initials }}
+                        @endif
+                    </div>
                     <h4 class="mb-0">{{ $patient->full_name }}</h4>
                     <p class="text-muted mb-3">{{ ucfirst($patient->gender) }} · {{ $patient->date_of_birth?->format('d M Y') ?? 'DOB not set' }}</p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap mb-3">
