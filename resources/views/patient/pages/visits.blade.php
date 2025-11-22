@@ -9,8 +9,14 @@
             <h4 class="mb-0">Visits &amp; Appointments</h4>
             <small class="text-muted">Your scheduled and past hospital visits.</small>
         </div>
-        <a href="{{ route('patient.portal.dashboard') }}" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('patient.portal.visits.request') }}" class="btn btn-primary btn-sm"><i class="iconoir-calendar me-1"></i>Request Visit</a>
+            <a href="{{ route('patient.portal.dashboard') }}" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+        </div>
     </div>
+    @if (session('status'))
+        <div class="alert alert-success">{{ session('status') }}</div>
+    @endif
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">

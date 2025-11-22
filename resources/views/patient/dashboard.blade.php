@@ -115,7 +115,7 @@
                         <h5 class="mb-0">Visits &amp; Appointments</h5>
                         <small class="text-muted">Latest hospital interactions</small>
                     </div>
-                    <button class="btn btn-soft-primary btn-sm">Request Visit</button>
+                    <a class="btn btn-soft-primary btn-sm" href="{{ route('patient.portal.visits.request') }}">Request Visit</a>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">

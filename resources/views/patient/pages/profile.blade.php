@@ -39,7 +39,7 @@
         <div class="col-lg-8">
             <div class="card h-100">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('patient.portal.profile.update') }}" class="row g-3">
+                    <form method="POST" action="{{ route('patient.portal.profile.update') }}" class="row g-3" enctype="multipart/form-data">
                         @csrf
                         <div class="col-md-6">
                             <label class="form-label">First Name</label>
@@ -62,8 +62,9 @@
                             <input type="text" class="form-control" name="phone" value="{{ old('phone', $patient->phone) }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Photo URL</label>
-                            <input type="url" class="form-control" name="photo_url" value="{{ old('photo_url', $patient->photo_url) }}">
+                            <label class="form-label">Profile Photo</label>
+                            <input type="file" class="form-control" name="photo" accept="image/*">
+                            <small class="text-muted">JPG/PNG, max 2MB.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Address</label>

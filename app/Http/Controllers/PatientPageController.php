@@ -7,8 +7,9 @@ use App\Models\NursingNote;
 use App\Models\Prescription;
 use App\Models\Visit;
 use App\Models\WalletTransaction;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PatientPageController extends Controller
 {
@@ -100,8 +101,13 @@ class PatientPageController extends Controller
             'state' => ['nullable', 'string', 'max:120'],
             'emergency_contact_name' => ['nullable', 'string', 'max:150'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:25'],
-            'photo_url' => ['nullable', 'url'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('public/avatars');
+            $data['photo_url'] = Storage::url($path);
+        }
 
         $patient->update($data);
 
