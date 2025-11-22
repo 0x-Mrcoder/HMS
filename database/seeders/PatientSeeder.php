@@ -34,6 +34,7 @@ class PatientSeeder extends Seeder
                 [
                     'balance' => rand(20000, 80000),
                     'low_balance_threshold' => $data['wallet_minimum_balance'],
+                    'virtual_account_number' => $patient->wallet?->virtual_account_number ?? \App\Models\Wallet::generateVirtualAccountNumber(),
                 ]
             );
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WalletController extends Controller
 {
@@ -21,7 +22,7 @@ class WalletController extends Controller
     {
         $data = $request->validate([
             'transaction_type' => ['required', 'in:deposit,deduction,refund'],
-            'payment_method' => ['required', 'in:cash,pos,transfer,online'],
+            'payment_method' => ['required', 'in:wallet,cash,pos,transfer,online'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'description' => ['nullable', 'string'],
             'service' => ['nullable', 'string'],
@@ -44,7 +45,8 @@ class WalletController extends Controller
         $wallet->transactions()->create([
             ...$data,
             'balance_after' => $newBalance,
-            'performed_by' => 'System Admin',
+            'performed_by' => Auth::user()?->name ?? 'System Admin',
+            'transacted_at' => now(),
         ]);
 
         return redirect()->route('wallets.show', $wallet)->with('status', 'Wallet updated successfully.');

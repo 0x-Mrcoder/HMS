@@ -40,6 +40,9 @@
                         <div>
                             <p class="text-muted mb-1">Wallet Balance</p>
                             <h2 class="mb-0">₦{{ number_format($wallet?->balance ?? 0, 2) }}</h2>
+                            @if($wallet?->virtual_account_number)
+                                <p class="mb-0 small text-muted">Virtual Account: <strong>{{ $wallet->virtual_account_number }}</strong></p>
+                            @endif
                             @if(!is_null($walletAlert) && $walletAlert > 0)
                                 <span class="badge bg-danger-subtle text-danger mt-1">Top up ₦{{ number_format($walletAlert, 2) }} to reach minimum balance</span>
                             @else
@@ -47,9 +50,34 @@
                             @endif
                         </div>
                         <div class="text-end">
-                            <button class="btn btn-primary me-2"><i class="iconoir-wallet me-1"></i>Add Funds</button>
-                            <button class="btn btn-outline-secondary">Download Statement</button>
+                            <a class="btn btn-outline-secondary me-2" href="{{ route('patient.portal.wallet.transactions') }}"><i class="iconoir-doc-text me-1"></i>History</a>
+                            <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#fund-wallet"><i class="iconoir-wallet me-1"></i>Add Funds</button>
                         </div>
+                    </div>
+                    <div class="collapse mb-3" id="fund-wallet">
+                        <form class="row g-2 align-items-end" method="POST" action="{{ route('patient.portal.wallet.deposit') }}">
+                            @csrf
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Amount (₦)</label>
+                                <input type="number" name="amount" step="0.01" min="0.01" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Payment Method</label>
+                                <select name="payment_method" class="form-select" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="pos">POS</option>
+                                    <option value="transfer">Transfer</option>
+                                    <option value="online">Online</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label mb-1">Reference</label>
+                                <input type="text" name="reference" class="form-control" placeholder="Optional ref">
+                            </div>
+                            <div class="col-md-1 d-grid">
+                                <button class="btn btn-success" type="submit">Top Up</button>
+                            </div>
+                        </form>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-4">
@@ -131,6 +159,9 @@
                             <li class="text-center text-muted py-4">No wallet activity yet.</li>
                         @endforelse
                     </ul>
+                    <div class="mt-3 text-end">
+                        <a href="{{ route('patient.portal.wallet.transactions') }}" class="btn btn-soft-secondary btn-sm">View full history</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -247,7 +278,24 @@
                         <small class="text-muted">{{ $patient->emergency_contact_phone ?? '--' }}</small>
                         <div class="mt-3">
                             <p class="text-muted mb-1">24/7 Support</p>
-                            <p class="mb-0">Call <strong>+234 800 HMS CARE</strong> or email <strong>support@hms.com</strong></p>
+                            @php
+                                $supportPhone = $hospitalConfig['phone'] ?? null;
+                                $supportEmail = $hospitalConfig['email'] ?? null;
+                            @endphp
+                            <p class="mb-0">
+                                @if($supportPhone)
+                                    Call <strong>{{ $supportPhone }}</strong>
+                                @endif
+                                @if($supportPhone && $supportEmail)
+                                    or
+                                @endif
+                                @if($supportEmail)
+                                    email <strong>{{ $supportEmail }}</strong>
+                                @endif
+                                @if(!$supportPhone && !$supportEmail)
+                                    Contact the hospital team for assistance.
+                                @endif
+                            </p>
                             <button class="btn btn-outline-primary btn-sm mt-2"><i class="bi bi-chat-dots me-1"></i>Chat with Care Team</button>
                         </div>
                     </div>

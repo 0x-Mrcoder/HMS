@@ -2,10 +2,15 @@
 <html lang="en" data-bs-theme="light" data-startbar="light">
 
 <head>
+    @php
+        $hospitalName = $hospitalConfig['name'] ?? 'Hospital';
+        $hospitalTagline = $hospitalConfig['tagline'] ?? 'Pharmacy portal';
+        $hospitalLogo = $hospitalConfig['logo_path'] ? asset($hospitalConfig['logo_path']) : asset('rizz-assets/images/favicon.ico');
+    @endphp
     <meta charset="utf-8" />
-    <title>@yield('title', 'Pharmacy Portal') | HMS Care</title>
+    <title>@yield('title', 'Pharmacy Portal') | {{ $hospitalName }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="{{ asset('rizz-assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ $hospitalLogo }}">
     <link href="{{ asset('rizz-assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('rizz-assets/css/icons.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('rizz-assets/css/app.min.css') }}" rel="stylesheet" />

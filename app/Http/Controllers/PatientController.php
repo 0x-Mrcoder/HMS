@@ -62,6 +62,7 @@ class PatientController extends Controller
         $patient->wallet()->create([
             'balance' => 0,
             'low_balance_threshold' => $data['wallet_minimum_balance'] ?? 0,
+            'virtual_account_number' => \App\Models\Wallet::generateVirtualAccountNumber(),
         ]);
 
         return redirect()->route('patients.show', $patient)->with('status', 'Patient profile created.');

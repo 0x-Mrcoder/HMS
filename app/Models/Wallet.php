@@ -13,6 +13,7 @@ class Wallet extends Model
         'patient_id',
         'balance',
         'low_balance_threshold',
+        'virtual_account_number',
     ];
 
     protected $casts = [
@@ -33,5 +34,14 @@ class Wallet extends Model
     public function getLowBalanceAttribute(): bool
     {
         return $this->balance <= $this->low_balance_threshold;
+    }
+
+    public static function generateVirtualAccountNumber(): string
+    {
+        do {
+            $candidate = 'VA' . strtoupper(bin2hex(random_bytes(4))) . rand(10, 99);
+        } while (static::where('virtual_account_number', $candidate)->exists());
+
+        return $candidate;
     }
 }

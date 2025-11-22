@@ -2,13 +2,18 @@
 <html lang="en" dir="ltr" data-startbar="light" data-bs-theme="light">
 
 <head>
+    @php
+        $hospitalName = $hospitalConfig['name'] ?? 'Hospital';
+        $hospitalTagline = $hospitalConfig['tagline'] ?? 'Patient portal';
+        $hospitalLogo = $hospitalConfig['logo_path'] ? asset($hospitalConfig['logo_path']) : asset('rizz-assets/images/favicon.ico');
+    @endphp
     <meta charset="utf-8" />
-    <title>@yield('title', 'Patient Portal') | HMS Care</title>
+    <title>@yield('title', 'Patient Portal') | {{ $hospitalName }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta content="Patient portal for HMS" name="description" />
+    <meta content="Patient portal for {{ $hospitalName }}. {{ $hospitalTagline }}" name="description" />
     <meta name="author" content="" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="shortcut icon" href="{{ asset('rizz-assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ $hospitalLogo }}">
     <link href="{{ asset('rizz-assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('rizz-assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('rizz-assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />

@@ -9,6 +9,8 @@ use App\Http\Controllers\NursingController;
 use App\Http\Controllers\DoctorPortalController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientPortalController;
+use App\Http\Controllers\PatientPageController;
+use App\Http\Controllers\PatientWalletController;
 use App\Http\Controllers\PharmacyPortalController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\PortalAuthController;
@@ -77,20 +79,35 @@ $portalSlugs = array_keys(config('hms.portals', []));
 
 Route::middleware('guest')->group(function () use ($portalSlugs) {
     foreach ($portalSlugs as $slug) {
-        Route::get("/{$slug}", [PortalAuthController::class, 'create'])
+        Route::redirect("/{$slug}", "/{$slug}/login")->name("portal.redirect.{$slug}");
+
+        Route::get("/{$slug}/login", [PortalAuthController::class, 'create'])
             ->name("portal.login.{$slug}")
             ->defaults('portal', $slug);
 
-        Route::post("/{$slug}", [PortalAuthController::class, 'store'])
+        Route::post("/{$slug}/login", [PortalAuthController::class, 'store'])
             ->name("portal.login.{$slug}.store")
             ->defaults('portal', $slug);
     }
 
     Route::get('/login', fn () => redirect()->route('portal.login.admin'))->name('login');
+    Route::redirect('/admin', '/admin/login');
+    Route::redirect('/patient', '/patient/login');
 });
 
-Route::middleware(['auth', 'portal:patient'])->prefix('patient-portal')->name('patient.portal.')->group(function () {
+Route::middleware(['auth', 'portal:patient'])->prefix('patient')->name('patient.portal.')->group(function () {
     Route::get('/dashboard', [PatientPortalController::class, 'dashboard'])->name('dashboard');
+    Route::post('/wallet/deposit', [PatientWalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::get('/wallet/transactions', [PatientWalletController::class, 'transactions'])->name('wallet.transactions');
+    Route::get('/wallet', [PatientPageController::class, 'wallet'])->name('wallet');
+    Route::get('/visits', [PatientPageController::class, 'visits'])->name('visits');
+    Route::get('/visits/request', [PatientPageController::class, 'requestVisit'])->name('visits.request');
+    Route::post('/visits', [PatientPageController::class, 'storeVisit'])->name('visits.store');
+    Route::get('/prescriptions', [PatientPageController::class, 'prescriptions'])->name('prescriptions');
+    Route::get('/labs', [PatientPageController::class, 'labs'])->name('labs');
+    Route::get('/care-notes', [PatientPageController::class, 'careNotes'])->name('care-notes');
+    Route::get('/profile', [PatientPageController::class, 'profile'])->name('profile');
+    Route::post('/profile', [PatientPageController::class, 'updateProfile'])->name('profile.update');
 });
 
 Route::middleware(['auth', 'portal:doctor'])->prefix('doctor-portal')->name('doctor.portal.')->group(function () {

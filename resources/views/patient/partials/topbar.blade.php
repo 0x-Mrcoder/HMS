@@ -1,27 +1,27 @@
 @php($patient = auth()->user()?->patient)
 <div class="topbar d-print-none patient-topbar border-0 shadow-sm">
     <div class="container-xxl">
-        <nav class="topbar-custom d-flex justify-content-between align-items-center" id="patient-topbar">
+        <nav class="topbar-custom d-flex justify-content-between align-items-center py-3 px-2 px-md-0" id="patient-topbar">
             <div class="d-flex align-items-center gap-3">
-                <button class="nav-link mobile-menu-btn nav-icon" id="togglemenu">
+                <button class="nav-link mobile-menu-btn nav-icon d-flex align-items-center justify-content-center" id="togglemenu" style="width:42px;height:42px;">
                     <i class="iconoir-menu-scale fs-4"></i>
                 </button>
-                <div>
-                    <p class="mb-0 text-muted small text-uppercase">My Care Hub</p>
-                    <h3 class="mb-0 fw-semibold">Hello, {{ $patient?->full_name ?? 'Patient' }} 👋</h3>
+                <div class="lh-sm">
+                    <p class="mb-1 text-muted small text-uppercase">My Care Hub</p>
+                    <h4 class="mb-0 fw-semibold">Hello, {{ $patient?->full_name ?? 'Patient' }} 👋</h4>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 gap-md-3">
                 <div class="text-end d-none d-md-block">
-                    <small class="text-muted">Hospital ID</small>
+                    <small class="text-muted text-uppercase ls-1">Hospital ID</small>
                     <p class="mb-0 fw-semibold">{{ $patient?->hospital_id }}</p>
                 </div>
-                <a href="#wallet" class="btn btn-outline-primary btn-sm d-none d-md-inline-flex align-items-center">
+                <a href="#wallet" class="btn btn-outline-primary btn-sm d-none d-md-inline-flex align-items-center px-3 py-2">
                     <i class="iconoir-wallet me-2"></i>Fund Wallet
                 </a>
                 <div class="dropdown">
-                    <a class="nav-link dropdown-toggle nav-user d-flex align-items-center" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ $patient?->photo_url ?? asset('rizz-assets/images/users/user-4.jpg') }}" alt="profile-user" class="thumb-lg rounded-circle me-2">
+                    <a class="nav-link dropdown-toggle nav-user d-flex align-items-center px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                        <img src="{{ $patient?->photo_url ?? asset('rizz-assets/images/users/user-4.jpg') }}" alt="profile-user" class="rounded-circle me-2" style="width:44px;height:44px;object-fit:cover;">
                         <div class="d-none d-sm-block text-start">
                             <h6 class="fw-semibold fs-14 mb-0">{{ $patient?->full_name }}</h6>
                             <small class="text-muted">Patient</small>

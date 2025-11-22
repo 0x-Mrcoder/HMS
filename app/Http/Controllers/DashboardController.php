@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\FinancialRecord;
 use App\Models\InsuranceClaim;
+use App\Models\LabTest;
 use App\Models\Patient;
 use App\Models\Surgery;
 use App\Models\Visit;
@@ -19,7 +20,7 @@ class DashboardController extends Controller
             'total_patients' => Patient::count(),
             'active_visits' => Visit::where('status', '!=', 'completed')->count(),
             'wallet_balance' => Wallet::sum('balance'),
-            'pending_tests' => Visit::where('status', 'pending')->count(),
+            'pending_tests' => LabTest::where('status', 'pending')->count(),
             'pending_claims' => InsuranceClaim::whereIn('claim_status', ['draft', 'submitted'])->count(),
             'scheduled_surgeries' => Surgery::whereIn('status', ['scheduled', 'in_progress'])->count(),
             'daily_income' => FinancialRecord::where('record_type', 'income')

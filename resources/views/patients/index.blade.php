@@ -10,7 +10,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <h4 class="card-title mb-0">Patient Registry</h4>
-                        <small class="text-muted">Track everyone registered into the HMS</small>
+                        <small class="text-muted">Track everyone registered into {{ $hospitalConfig['name'] ?? 'the hospital' }}</small>
                     </div>
                     <a href="{{ route('patients.create') }}" class="btn btn-primary"><i class="iconoir-add-circle me-1"></i>New Patient</a>
                 </div>

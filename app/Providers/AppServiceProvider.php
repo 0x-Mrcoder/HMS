@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Support\HospitalConfig;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(HospitalConfig::class, fn () => new HospitalConfig());
     }
 
     /**
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('*', function ($view) {
+            $hospital = app(HospitalConfig::class)->get();
+            $view->with('hospitalConfig', $hospital);
+        });
     }
 }

@@ -21,6 +21,10 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Hospital configuration
+
+The HMS is multi-tenant-ready through a `hospital_settings` table. Seed data for **CyberHausa Clinic** (name, tagline, colors, logo) is included via `HospitalSettingSeeder` and a logo at `public/storage/hospital/cyberhausa-logo.svg`. To customize for a new hospital, update the record in the table (or create a new one) and adjust environment fallbacks in `config/hospital.php`. Views receive `hospitalConfig` automatically for rendering branding and contact details.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
