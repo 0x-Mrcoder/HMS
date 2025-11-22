@@ -23,7 +23,7 @@
 </head>
 
 <body id="body" class="@yield('body-class', 'patient-portal')">
-    @include('patient.partials.topbar')
+    @include('layouts.partials.topbar')
     @include('patient.partials.startbar')
 
     <div class="page-wrapper">

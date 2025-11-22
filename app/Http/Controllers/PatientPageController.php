@@ -10,6 +10,7 @@ use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class PatientPageController extends Controller
 {
@@ -131,7 +132,7 @@ class PatientPageController extends Controller
         $data = $request->validate([
             'department_id' => ['required', 'exists:departments,id'],
             'service_id' => ['nullable', 'exists:services,id'],
-            'visit_type' => ['required', 'in:opd,ipd'],
+            'visit_type' => ['required', Rule::in(['opd', 'ipd'])],
             'reason' => ['required', 'string', 'max:500'],
             'scheduled_at' => ['nullable', 'date'],
         ]);
@@ -143,5 +144,43 @@ class PatientPageController extends Controller
         ]);
 
         return redirect()->route('patient.portal.visits')->with('status', 'Visit requested successfully. We will confirm the schedule soon.');
+    }
+
+    public function showVisit(Visit $visit)
+    {
+        $patient = $this->patientOrFail();
+        abort_unless($visit->patient_id === $patient->id, 403);
+
+        $visit->load(['department', 'service']);
+
+        return view('patient.pages.visit-show', compact('patient', 'visit'));
+    }
+
+    public function updateVisit(Request $request, Visit $visit)
+    {
+        $patient = $this->patientOrFail();
+        abort_unless($visit->patient_id === $patient->id, 403);
+
+        $data = $request->validate([
+            'scheduled_at' => ['nullable', 'date'],
+            'reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        $visit->update([
+            'scheduled_at' => $data['scheduled_at'] ?? $visit->scheduled_at,
+            'reason' => $data['reason'],
+        ]);
+
+        return redirect()->route('patient.portal.visits.show', $visit)->with('status', 'Visit updated successfully.');
+    }
+
+    public function cancelVisit(Visit $visit)
+    {
+        $patient = $this->patientOrFail();
+        abort_unless($visit->patient_id === $patient->id, 403);
+
+        $visit->update(['status' => 'cancelled']);
+
+        return redirect()->route('patient.portal.visits')->with('status', 'Visit request cancelled.');
     }
 }
