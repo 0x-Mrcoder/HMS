@@ -23,6 +23,7 @@
                             <th>Duration</th>
                             <th>Status</th>
                             <th>Clinic</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,6 +35,9 @@
                                 <td>{{ $prescription->duration }}</td>
                                 <td><span class="badge bg-secondary-subtle text-capitalize">{{ $prescription->status }}</span></td>
                                 <td>{{ $prescription->visit?->department?->name ?? 'N/A' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ route('patient.portal.prescriptions.show', $prescription) }}" class="btn btn-soft-secondary btn-sm">Details</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>

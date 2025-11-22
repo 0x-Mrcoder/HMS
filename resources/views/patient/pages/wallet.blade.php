@@ -6,8 +6,8 @@
 <div class="container-xxl py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="mb-0">Wallet &amp; Funding</h4>
-            <small class="text-muted">Manage your wallet balance and statements.</small>
+            <h4 class="mb-0">My Wallet</h4>
+            <small class="text-muted">Fund your wallet via your static virtual account.</small>
         </div>
         <a href="{{ route('patient.portal.wallet.transactions') }}" class="btn btn-outline-secondary btn-sm"><i class="iconoir-doc-text me-1"></i>Full History</a>
     </div>
@@ -15,49 +15,34 @@
         <div class="col-lg-6">
             <div class="card h-100">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div>
-                            <p class="text-muted mb-1">Current Balance</p>
-                            <h2 class="mb-0">₦{{ number_format(optional($patient->wallet)->balance ?? 0, 2) }}</h2>
-                            @if($patient->wallet?->virtual_account_number)
-                                <p class="mb-0 small text-muted">Virtual Account: <strong>{{ $patient->wallet->virtual_account_number }}</strong></p>
-                            @endif
-                            @if(!is_null($walletAlert) && $walletAlert > 0)
-                                <span class="badge bg-danger-subtle text-danger mt-1">Top up ₦{{ number_format($walletAlert, 2) }} to reach minimum balance</span>
-                            @else
-                                <span class="badge bg-success-subtle text-success mt-1">Wallet is healthy</span>
-                            @endif
+                    <p class="text-muted mb-1">Current Balance</p>
+                    <h2 class="mb-1">₦{{ number_format(optional($patient->wallet)->balance ?? 0, 2) }}</h2>
+                    @if(!is_null($walletAlert) && $walletAlert > 0)
+                        <span class="badge bg-danger-subtle text-danger">Top up ₦{{ number_format($walletAlert, 2) }} to reach minimum balance</span>
+                    @else
+                        <span class="badge bg-success-subtle text-success">Wallet is healthy</span>
+                    @endif
+                    <hr>
+                    <p class="text-muted mb-1">Virtual Account (Sterling Bank)</p>
+                    @if($patient->wallet?->virtual_account_number)
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <h4 class="mb-0">{{ $patient->wallet->virtual_account_number }}</h4>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="navigator.clipboard.writeText('{{ $patient->wallet->virtual_account_number }}')">Copy</button>
                         </div>
-                        <div class="text-end">
-                            <p class="mb-1 text-muted small">Hospital ID</p>
-                            <p class="fw-semibold mb-0">{{ $patient->hospital_id }}</p>
-                        </div>
-                    </div>
-                    <div class="border rounded p-3">
-                        <form class="row g-2 align-items-end" method="POST" action="{{ route('patient.portal.wallet.deposit') }}">
+                        <small class="text-muted">Bank: Sterling Bank</small>
+                        <p class="mt-3 mb-1 fw-semibold">How to fund</p>
+                        <ul class="text-muted mb-0">
+                            <li>Transfer to the virtual account number above (Sterling Bank).</li>
+                            <li>Funds will reflect instantly after bank confirmation.</li>
+                            <li>Use the transaction reference from your bank for support.</li>
+                        </ul>
+                    @else
+                        <form method="POST" action="{{ route('patient.portal.wallet.generate') }}">
                             @csrf
-                            <div class="col-md-5">
-                                <label class="form-label mb-1">Amount (₦)</label>
-                                <input type="number" name="amount" step="0.01" min="0.01" class="form-control" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label mb-1">Payment Method</label>
-                                <select name="payment_method" class="form-select" required>
-                                    <option value="cash">Cash</option>
-                                    <option value="pos">POS</option>
-                                    <option value="transfer">Transfer</option>
-                                    <option value="online">Online</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label mb-1">Reference</label>
-                                <input type="text" name="reference" class="form-control" placeholder="Optional">
-                            </div>
-                            <div class="col-12 d-grid">
-                                <button class="btn btn-primary" type="submit"><i class="iconoir-wallet me-1"></i>Add Funds</button>
-                            </div>
+                            <p class="text-muted">Generate your Sterling Bank virtual account to fund your wallet.</p>
+                            <button class="btn btn-primary" type="submit">Generate Account Number</button>
                         </form>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

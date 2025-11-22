@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LabTest;
 use App\Models\NursingNote;
 use App\Models\Prescription;
+use App\Models\InsuranceClaim;
 use App\Models\Visit;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
@@ -57,6 +58,15 @@ class PatientPageController extends Controller
         return view('patient.pages.prescriptions', compact('patient', 'prescriptions'));
     }
 
+    public function showPrescription(Prescription $prescription)
+    {
+        $patient = $this->patientOrFail();
+        abort_unless($prescription->visit?->patient_id === $patient->id, 403);
+        $prescription->load('visit.department');
+
+        return view('patient.pages.prescription-show', compact('patient', 'prescription'));
+    }
+
     public function labs()
     {
         $patient = $this->patientOrFail();
@@ -66,6 +76,15 @@ class PatientPageController extends Controller
             ->paginate(10);
 
         return view('patient.pages.labs', compact('patient', 'labTests'));
+    }
+
+    public function showLab(LabTest $labTest)
+    {
+        $patient = $this->patientOrFail();
+        abort_unless($labTest->visit?->patient_id === $patient->id, 403);
+        $labTest->load('visit.department');
+
+        return view('patient.pages.lab-show', compact('patient', 'labTest'));
     }
 
     public function careNotes()
@@ -182,5 +201,15 @@ class PatientPageController extends Controller
         $visit->update(['status' => 'cancelled']);
 
         return redirect()->route('patient.portal.visits')->with('status', 'Visit request cancelled.');
+    }
+
+    public function claims()
+    {
+        $patient = $this->patientOrFail();
+        $claims = InsuranceClaim::where('patient_id', $patient->id)
+            ->latest('updated_at')
+            ->paginate(10);
+
+        return view('patient.pages.claims', compact('patient', 'claims'));
     }
 }

@@ -22,6 +22,7 @@
                             <th>Result</th>
                             <th>Department</th>
                             <th>When</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,6 +33,9 @@
                                 <td>{{ $test->result_summary ?? 'Awaiting result' }}</td>
                                 <td>{{ $test->visit?->department?->name ?? 'Laboratory' }}</td>
                                 <td>{{ $test->result_at?->format('d M Y, h:ia') ?? $test->created_at->format('d M Y, h:ia') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ route('patient.portal.labs.show', $test) }}" class="btn btn-soft-secondary btn-sm">Details</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>

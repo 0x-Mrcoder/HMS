@@ -28,6 +28,7 @@
                             <th>Status</th>
                             <th>Doctor</th>
                             <th>Scheduled</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,9 @@
                                 <td><span class="badge bg-secondary-subtle text-capitalize">{{ str_replace('_', ' ', $visit->status) }}</span></td>
                                 <td>{{ $visit->doctor_name ?? '--' }}</td>
                                 <td>{{ $visit->scheduled_at?->format('d M Y, h:ia') ?? 'Pending' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ route('patient.portal.visits.show', $visit) }}" class="btn btn-soft-secondary btn-sm">Details</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>

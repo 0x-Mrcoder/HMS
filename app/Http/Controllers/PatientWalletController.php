@@ -39,6 +39,52 @@ class PatientWalletController extends Controller
         return back()->with('status', 'Wallet funded successfully.');
     }
 
+    public function simulateCredit(Request $request)
+    {
+        $patient = Auth::user()?->patient;
+        abort_unless($patient && $patient->wallet, 403);
+
+        $data = $request->validate([
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'reference' => ['nullable', 'string', 'max:120'],
+            'payment_method' => ['nullable', 'in:transfer,pos,online,cash'],
+        ]);
+
+        $wallet = $patient->wallet()->lockForUpdate()->first();
+        $newBalance = $wallet->balance + (float) $data['amount'];
+
+        $wallet->update(['balance' => $newBalance]);
+
+        $wallet->transactions()->create([
+            'transaction_type' => 'deposit',
+            'payment_method' => $data['payment_method'] ?? 'transfer',
+            'amount' => $data['amount'],
+            'balance_after' => $newBalance,
+            'reference' => $data['reference'] ?? 'SIM-' . now()->timestamp,
+            'performed_by' => $patient->full_name,
+            'service' => 'Virtual Account Credit',
+            'description' => 'Simulated bank credit to virtual account.',
+            'transacted_at' => now(),
+        ]);
+
+        return back()->with('status', 'Simulated deposit posted to wallet.');
+    }
+
+    public function generateAccount()
+    {
+        $patient = Auth::user()?->patient;
+        abort_unless($patient && $patient->wallet, 403);
+
+        if ($patient->wallet->virtual_account_number) {
+            return back()->with('status', 'Virtual account already assigned.');
+        }
+
+        $accountNumber = \App\Models\Wallet::generateVirtualAccountNumber();
+        $patient->wallet->update(['virtual_account_number' => $accountNumber]);
+
+        return back()->with('status', 'Virtual account generated.');
+    }
+
     public function transactions()
     {
         $patient = Auth::user()?->patient;

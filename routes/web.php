@@ -98,16 +98,24 @@ Route::middleware('guest')->group(function () use ($portalSlugs) {
 Route::middleware(['auth', 'portal:patient'])->prefix('patient')->name('patient.portal.')->group(function () {
     Route::get('/dashboard', [PatientPortalController::class, 'dashboard'])->name('dashboard');
     Route::post('/wallet/deposit', [PatientWalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::post('/wallet/simulate-credit', [PatientWalletController::class, 'simulateCredit'])->name('wallet.simulate');
     Route::get('/wallet/transactions', [PatientWalletController::class, 'transactions'])->name('wallet.transactions');
+    Route::post('/wallet/generate-account', [PatientWalletController::class, 'generateAccount'])->name('wallet.generate');
     Route::get('/wallet', [PatientPageController::class, 'wallet'])->name('wallet');
     Route::get('/visits', [PatientPageController::class, 'visits'])->name('visits');
     Route::get('/visits/request', [PatientPageController::class, 'requestVisit'])->name('visits.request');
     Route::post('/visits', [PatientPageController::class, 'storeVisit'])->name('visits.store');
+    Route::get('/visits/{visit}', [PatientPageController::class, 'showVisit'])->name('visits.show');
+    Route::patch('/visits/{visit}', [PatientPageController::class, 'updateVisit'])->name('visits.update');
+    Route::post('/visits/{visit}/cancel', [PatientPageController::class, 'cancelVisit'])->name('visits.cancel');
     Route::get('/prescriptions', [PatientPageController::class, 'prescriptions'])->name('prescriptions');
+    Route::get('/prescriptions/{prescription}', [PatientPageController::class, 'showPrescription'])->name('prescriptions.show');
     Route::get('/labs', [PatientPageController::class, 'labs'])->name('labs');
+    Route::get('/labs/{labTest}', [PatientPageController::class, 'showLab'])->name('labs.show');
     Route::get('/care-notes', [PatientPageController::class, 'careNotes'])->name('care-notes');
     Route::get('/profile', [PatientPageController::class, 'profile'])->name('profile');
     Route::post('/profile', [PatientPageController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/claims', [PatientPageController::class, 'claims'])->name('claims');
 });
 
 Route::middleware(['auth', 'portal:doctor'])->prefix('doctor-portal')->name('doctor.portal.')->group(function () {
