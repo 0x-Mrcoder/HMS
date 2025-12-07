@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Prescription;
 use App\Models\Visit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PharmacyPortalController extends Controller

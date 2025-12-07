@@ -147,6 +147,7 @@ Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharma
     Route::get('/prescriptions', [PharmacyPortalController::class, 'index'])->name('prescriptions.index');
     Route::get('/prescriptions/{prescription}', [PharmacyPortalController::class, 'show'])->name('prescriptions.show');
     Route::post('/prescriptions/{prescription}/dispense', [PharmacyPortalController::class, 'dispense'])->name('dispense');
+    Route::get('/prescriptions/{prescription}/dispense', fn($prescription) => redirect()->route('pharmacy.portal.prescriptions.show', $prescription));
 
     // Inventory
     Route::get('/inventory', [PharmacyPortalController::class, 'inventory'])->name('inventory.index');
