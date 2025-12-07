@@ -1,10 +1,9 @@
-@extends('layouts.doctor')
+<x-doctor-layout>
+    <x-slot name="header">
+        Doctor Workspace
+    </x-slot>
 
-@section('title', 'Doctor Workspace')
-
-@section('content')
-<div class="container-xxl py-4">
-    <div class="row g-3" id="overview">
+    <div class="row g-3">
         <div class="col-md-3">
             <div class="card mini-widget">
                 <div class="card-body">
@@ -43,15 +42,15 @@
         </div>
     </div>
 
-    <div class="row g-3 mt-1" id="clinic-queue">
-        <div class="col-lg-8" id="appointments">
+    <div class="row g-3 mt-1">
+        <div class="col-lg-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="mb-0">Clinic Queue</h5>
+                        <h4 class="card-title mb-0">Clinic Queue</h4>
                         <small class="text-muted">Patients waiting for consultation</small>
                     </div>
-                    <button class="btn btn-soft-primary btn-sm">Start next consult</button>
+                    <a href="{{ route('doctor.portal.queue') }}" class="btn btn-sm btn-soft-primary">View Full Queue</a>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -62,7 +61,10 @@
                                         <p class="mb-0 fw-semibold">{{ $visit->patient->full_name }}</p>
                                         <small class="text-muted">{{ $visit->department?->name }} · {{ $visit->scheduled_at?->format('h:ia') ?? 'Walk-in' }}</small>
                                     </div>
-                                    <span class="badge bg-secondary-subtle text-capitalize">{{ str_replace('_', ' ', $visit->status) }}</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-secondary-subtle text-capitalize">{{ str_replace('_', ' ', $visit->status) }}</span>
+                                        <a href="{{ route('doctor.portal.visits.show', $visit) }}" class="btn btn-sm btn-light">Consult</a>
+                                    </div>
                                 </div>
                             </li>
                         @empty
@@ -76,7 +78,7 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Upcoming Visits</h5>
-                    <button class="btn btn-soft-secondary btn-sm">View calendar</button>
+                    <a href="{{ route('doctor.portal.appointments') }}" class="btn btn-soft-secondary btn-sm">View All</a>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mb-0">
@@ -98,11 +100,11 @@
     </div>
 
     <div class="row g-3 mt-1">
-        <div class="col-lg-6" id="prescriptions">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Prescription Board</h5>
-                    <button class="btn btn-soft-secondary btn-sm">Create Rx</button>
+                    <a href="{{ route('doctor.portal.prescriptions') }}" class="btn btn-soft-secondary btn-sm">View History</a>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -123,11 +125,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6" id="labs">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Laboratory Feed</h5>
-                    <button class="btn btn-soft-secondary btn-sm">Order test</button>
+                    <a href="{{ route('doctor.portal.labs') }}" class="btn btn-soft-secondary btn-sm">View Results</a>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -149,5 +151,4 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-doctor-layout>

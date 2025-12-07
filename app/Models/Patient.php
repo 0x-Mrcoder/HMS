@@ -65,6 +65,21 @@ class Patient extends Model
         return $this->hasOne(User::class);
     }
 
+    public function admissions()
+    {
+        return $this->hasMany(Admission::class);
+    }
+
+    public function surgeries()
+    {
+        return $this->hasMany(Surgery::class);
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(Referral::class);
+    }
+
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");

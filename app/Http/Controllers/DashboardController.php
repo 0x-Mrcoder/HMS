@@ -16,6 +16,18 @@ class DashboardController extends Controller
 {
     public function __invoke()
     {
+        $user = auth()->user();
+
+        if ($user->role === 'doctor') {
+            return redirect()->route('doctor.portal.dashboard');
+        }
+        if ($user->role === 'pharmacy') {
+            return redirect()->route('pharmacy.portal.dashboard');
+        }
+        if ($user->role === 'patient') {
+            return redirect()->route('patient.portal.dashboard');
+        }
+
         $metrics = [
             'total_patients' => Patient::count(),
             'active_visits' => Visit::where('status', '!=', 'completed')->count(),

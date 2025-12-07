@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
 
-    Route::prefix('pharmacy')->name('pharmacy.')->group(function () {
+    Route::prefix('admin/pharmacy')->name('admin.pharmacy.')->group(function () {
         Route::get('prescriptions', [PharmacyController::class, 'index'])->name('prescriptions.index');
         Route::get('prescriptions/{prescription}', [PharmacyController::class, 'show'])->name('prescriptions.show');
         Route::patch('prescriptions/{prescription}', [PharmacyController::class, 'update'])->name('prescriptions.update');
@@ -118,10 +118,37 @@ Route::middleware(['auth', 'portal:patient'])->prefix('patient')->name('patient.
     Route::get('/claims', [PatientPageController::class, 'claims'])->name('claims');
 });
 
-Route::middleware(['auth', 'portal:doctor'])->prefix('doctor-portal')->name('doctor.portal.')->group(function () {
+Route::middleware(['auth', 'portal:doctor'])->prefix('doctor')->name('doctor.portal.')->group(function () {
     Route::get('/dashboard', [DoctorPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/patients', [DoctorPortalController::class, 'patients'])->name('patients.index');
+    Route::get('/patients/{patient}', [DoctorPortalController::class, 'showPatient'])->name('patients.show');
+    Route::get('/visits/{visit}', [DoctorPortalController::class, 'showVisit'])->name('visits.show');
+    Route::post('/visits/{visit}/prescribe', [DoctorPortalController::class, 'storePrescription'])->name('visits.prescribe');
+    Route::post('/visits/{visit}/lab-test', [DoctorPortalController::class, 'storeLabTest'])->name('visits.lab-test');
+    Route::post('/visits/{visit}/diagnosis', [DoctorPortalController::class, 'storeDiagnosis'])->name('visits.diagnosis');
+    Route::post('/visits/{visit}/admit', [DoctorPortalController::class, 'storeAdmission'])->name('visits.admit');
+    Route::post('/visits/{visit}/refer', [DoctorPortalController::class, 'storeReferral'])->name('visits.refer');
+    Route::post('/visits/{visit}/surgery', [DoctorPortalController::class, 'storeSurgery'])->name('visits.surgery');
+    Route::get('/drugs/search', [DoctorPortalController::class, 'searchDrugs'])->name('drugs.search');
+
+    // New Menu Routes
+    Route::get('/queue', [DoctorPortalController::class, 'queue'])->name('queue');
+    Route::get('/appointments', [DoctorPortalController::class, 'appointments'])->name('appointments');
+    Route::get('/prescriptions', [DoctorPortalController::class, 'prescriptions'])->name('prescriptions');
+    Route::get('/labs', [DoctorPortalController::class, 'labs'])->name('labs');
+    Route::get('/nursing-notes', [DoctorPortalController::class, 'nursingNotes'])->name('nursing-notes');
+    Route::get('/theatre-requests', [DoctorPortalController::class, 'theatreRequests'])->name('theatre-requests');
 });
 
-Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy-portal')->name('pharmacy.portal.')->group(function () {
+Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharmacy.portal.')->group(function () {
     Route::get('/dashboard', [PharmacyPortalController::class, 'dashboard'])->name('dashboard');
+    
+    // Prescriptions
+    Route::get('/prescriptions', [PharmacyPortalController::class, 'index'])->name('prescriptions.index');
+    Route::get('/prescriptions/{prescription}', [PharmacyPortalController::class, 'show'])->name('prescriptions.show');
+    Route::post('/prescriptions/{prescription}/dispense', [PharmacyPortalController::class, 'dispense'])->name('dispense');
+
+    // Inventory
+    Route::get('/inventory', [PharmacyPortalController::class, 'inventory'])->name('inventory.index');
+    Route::post('/inventory/{drug}/update', [PharmacyPortalController::class, 'updateStock'])->name('inventory.update');
 });
