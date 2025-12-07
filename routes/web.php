@@ -153,4 +153,9 @@ Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharma
     Route::get('/inventory', [PharmacyPortalController::class, 'inventory'])->name('inventory.index');
     Route::post('/inventory', [PharmacyPortalController::class, 'store'])->name('inventory.store');
     Route::post('/inventory/{drug}/update', [PharmacyPortalController::class, 'update'])->name('inventory.update');
+
+    // Profile
+    Route::get('/profile', [PharmacyPortalController::class, 'profile'])->name('profile');
+    Route::post('/profile', [PharmacyPortalController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [PharmacyPortalController::class, 'updatePassword'])->name('profile.update-password');
 });

@@ -53,6 +53,8 @@
                             <small class="text-muted">{{ $displayEmail }}</small>
                         </div>
                         <div class="dropdown-divider mb-0"></div>
+                        <a class="dropdown-item" href="{{ route('pharmacy.portal.profile') }}"><i class="bi bi-person fs-18 align-text-bottom me-2"></i> Profile</a>
+                        <div class="dropdown-divider mb-0"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">

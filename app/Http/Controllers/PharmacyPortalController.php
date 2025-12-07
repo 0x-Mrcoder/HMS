@@ -141,4 +141,44 @@ class PharmacyPortalController extends Controller
 
         return back()->with('status', 'Drug updated successfully.');
     }
+
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('pharmacy.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'photo' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('public/avatars');
+            $data['photo_url'] = \Illuminate\Support\Facades\Storage::url($path);
+        }
+
+        $user->update($data);
+
+        return back()->with('status', 'Profile updated successfully.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
+
+        Auth::user()->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        return back()->with('status', 'Password updated successfully.');
+    }
 }
