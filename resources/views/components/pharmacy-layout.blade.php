@@ -6,7 +6,7 @@
         $hospitalConfig = config('hms.hospital', []);
         $hospitalName = $hospitalConfig['name'] ?? 'Hospital';
         $hospitalTagline = $hospitalConfig['tagline'] ?? 'Pharmacy Portal';
-        $hospitalLogo = $hospitalConfig['logo_path'] ? asset($hospitalConfig['logo_path']) : asset('rizz-assets/images/favicon.ico');
+        $hospitalLogo = ($hospitalConfig['logo_path'] ?? null) ? asset($hospitalConfig['logo_path']) : asset('rizz-assets/images/favicon.ico');
     @endphp
     <meta charset="utf-8" />
     <title>@yield('title', 'Pharmacy Portal') | {{ $hospitalName }}</title>

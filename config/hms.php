@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'hospital' => [
+        'name' => 'CyberHausa Hospital',
+        'tagline' => 'Excellence in Care',
+        'logo_path' => 'rizz-assets/images/logo-sm.png',
+    ],
     'portals' => [
         'admin' => [
             'label' => 'Hospital Administrator',
