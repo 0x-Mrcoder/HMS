@@ -151,5 +151,6 @@ Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharma
 
     // Inventory
     Route::get('/inventory', [PharmacyPortalController::class, 'inventory'])->name('inventory.index');
-    Route::post('/inventory/{drug}/update', [PharmacyPortalController::class, 'updateStock'])->name('inventory.update');
+    Route::post('/inventory', [PharmacyPortalController::class, 'store'])->name('inventory.store');
+    Route::post('/inventory/{drug}/update', [PharmacyPortalController::class, 'update'])->name('inventory.update');
 });

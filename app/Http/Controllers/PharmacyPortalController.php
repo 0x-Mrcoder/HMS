@@ -116,14 +116,29 @@ class PharmacyPortalController extends Controller
         return view('pharmacy.inventory.index', compact('drugs'));
     }
 
-    public function updateStock(Request $request, \App\Models\Drug $drug)
+    public function store(Request $request)
     {
         $data = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:drugs,name'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        \App\Models\Drug::create($data);
+
+        return back()->with('status', 'Drug added successfully.');
+    }
+
+    public function update(Request $request, \App\Models\Drug $drug)
+    {
+        $data = $request->validate([
+            'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
         ]);
 
-        $drug->update(['stock' => $data['stock']]);
+        $drug->update($data);
 
-        return back()->with('status', 'Stock updated successfully.');
+        return back()->with('status', 'Drug updated successfully.');
     }
 }
