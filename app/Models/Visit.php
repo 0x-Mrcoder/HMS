@@ -10,6 +10,13 @@ class Visit extends Model
     use HasFactory;
 
     protected $fillable = [
+        'doctor_id', // Added
+        'ward_id',   // Added
+        'bed_id',    // Added
+        'diagnosis', // Added
+        'symptoms',  // Added
+        'admission_date', // Added
+        'discharge_date', // Added
         'patient_id',
         'department_id',
         'service_id',
@@ -30,11 +37,28 @@ class Visit extends Model
         'amount_charged' => 'decimal:2',
         'scheduled_at' => 'datetime',
         'completed_at' => 'datetime',
+        'admission_date' => 'datetime',
+        'discharge_date' => 'datetime',
     ];
 
     public function patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function doctor()
+    {
+        return $this->belongsTo(User::class, 'doctor_id');
+    }
+
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
+    }
+
+    public function bed()
+    {
+        return $this->belongsTo(Bed::class);
     }
 
     public function department()

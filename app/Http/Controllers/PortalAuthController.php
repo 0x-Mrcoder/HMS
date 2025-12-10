@@ -72,6 +72,8 @@ class PortalAuthController extends Controller
             'patient' => 'patient.portal.dashboard',
             'doctor' => 'doctor.portal.dashboard',
             'pharmacy' => 'pharmacy.portal.dashboard',
+            'laboratory' => 'lab.portal.dashboard',
+            'staff' => 'staff.portal.dashboard',
             default => 'dashboard',
         };
     }

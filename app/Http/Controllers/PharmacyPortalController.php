@@ -95,6 +95,17 @@ class PharmacyPortalController extends Controller
         // Deduct Stock
         $drug->decrement('stock', $prescription->quantity);
 
+        // Log Stock Change
+        \DB::table('drug_stock_logs')->insert([
+            'drug_id' => $drug->id,
+            'user_id' => Auth::id(),
+            'quantity_change' => -$prescription->quantity,
+            'type' => 'dispensed',
+            'notes' => 'Dispensed for Prescription #' . $prescription->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         // Deduct Wallet
         $patientWallet->decrement('balance', $totalCost);
 
@@ -118,14 +129,26 @@ class PharmacyPortalController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $data = $rerquest->validate([
             'name' => ['required', 'string', 'max:255', 'unique:drugs,name'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'expiry_date' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
         ]);
 
-        \App\Models\Drug::create($data);
+        $drug = \App\Models\Drug::create($data);
+
+        // Log Stock Change
+        \DB::table('drug_stock_logs')->insert([
+            'drug_id' => $drug->id,
+            'user_id' => Auth::id(),
+            'quantity_change' => $data['stock'],
+            'type' => 'in',
+            'notes' => 'Initial Stock',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return back()->with('status', 'Drug added successfully.');
     }
@@ -135,11 +158,77 @@ class PharmacyPortalController extends Controller
         $data = $request->validate([
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'expiry_date' => ['nullable', 'date'],
         ]);
 
+        $oldStock = $drug->stock;
         $drug->update($data);
 
+        $stockDiff = $data['stock'] - $oldStock;
+
+        if ($stockDiff != 0) {
+            \DB::table('drug_stock_logs')->insert([
+                'drug_id' => $drug->id,
+                'user_id' => Auth::id(),
+                'quantity_change' => $stockDiff,
+                'type' => $stockDiff > 0 ? 'in' : 'adjustment',
+                'notes' => 'Stock Update',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
         return back()->with('status', 'Drug updated successfully.');
+    }
+
+    public function reject(Request $request, Prescription $prescription)
+    {
+        $request->validate(['rejection_reason' => 'required|string|max:500']);
+
+        $prescription->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+            'dispensed_by' => Auth::user()->name, // Track who rejected it
+        ]);
+
+        return redirect()->route('pharmacy.portal.dashboard')->with('status', 'Prescription rejected.');
+    }
+
+    public function stockLogs(\App\Models\Drug $drug)
+    {
+        $logs = \DB::table('drug_stock_logs')
+            ->join('users', 'drug_stock_logs.user_id', '=', 'users.id')
+            ->where('drug_id', $drug->id)
+            ->select('drug_stock_logs.*', 'users.name as user_name')
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        return view('pharmacy.inventory.logs', compact('drug', 'logs'));
+    }
+
+    public function reports(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->endOfMonth()->format('Y-m-d'));
+
+        $sales = Prescription::where('status', 'dispensed')
+            ->whereBetween('dispensed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->with(['visit.patient'])
+            ->orderByDesc('dispensed_at')
+            ->get();
+
+        $totalRevenue = $sales->sum('total_cost');
+        $totalItems = $sales->sum('quantity');
+
+        // Group by Drug
+        $salesByDrug = $sales->groupBy('drug_name')->map(function ($group) {
+            return [
+                'quantity' => $group->sum('quantity'),
+                'revenue' => $group->sum('total_cost'),
+            ];
+        })->sortByDesc('revenue');
+
+        return view('pharmacy.reports.index', compact('sales', 'totalRevenue', 'totalItems', 'salesByDrug', 'startDate', 'endDate'));
     }
 
     public function profile()

@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('prescriptions/{prescription}', [PharmacyController::class, 'update'])->name('prescriptions.update');
     });
 
-    Route::prefix('laboratory')->name('laboratory.')->group(function () {
+    Route::prefix('admin/laboratory')->name('laboratory.')->group(function () {
         Route::get('tests', [LaboratoryController::class, 'index'])->name('tests.index');
         Route::get('tests/{labTest}', [LaboratoryController::class, 'show'])->name('tests.show');
         Route::patch('tests/{labTest}', [LaboratoryController::class, 'update'])->name('tests.update');
@@ -148,14 +148,54 @@ Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharma
     Route::get('/prescriptions/{prescription}', [PharmacyPortalController::class, 'show'])->name('prescriptions.show');
     Route::post('/prescriptions/{prescription}/dispense', [PharmacyPortalController::class, 'dispense'])->name('dispense');
     Route::get('/prescriptions/{prescription}/dispense', fn($prescription) => redirect()->route('pharmacy.portal.prescriptions.show', $prescription));
+    Route::post('/prescriptions/{prescription}/reject', [PharmacyPortalController::class, 'reject'])->name('prescriptions.reject');
 
     // Inventory
     Route::get('/inventory', [PharmacyPortalController::class, 'inventory'])->name('inventory.index');
     Route::post('/inventory', [PharmacyPortalController::class, 'store'])->name('inventory.store');
     Route::post('/inventory/{drug}/update', [PharmacyPortalController::class, 'update'])->name('inventory.update');
+    Route::get('/inventory/{drug}/logs', [PharmacyPortalController::class, 'stockLogs'])->name('inventory.logs');
+
+    // Reports
+    Route::get('/reports', [PharmacyPortalController::class, 'reports'])->name('reports.index');
 
     // Profile
     Route::get('/profile', [PharmacyPortalController::class, 'profile'])->name('profile');
     Route::post('/profile', [PharmacyPortalController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [PharmacyPortalController::class, 'updatePassword'])->name('profile.update-password');
+});
+
+// Lab Portal Routes
+Route::middleware(['auth', 'portal:laboratory'])->prefix('laboratory')->name('lab.portal.')->group(function () {
+    Route::get('/', [App\Http\Controllers\LabPortalController::class, 'dashboard'])->name('dashboard');
+    
+    Route::get('/requests', [App\Http\Controllers\LabPortalController::class, 'index'])->name('requests.index');
+    Route::get('/requests/{id}', [App\Http\Controllers\LabPortalController::class, 'show'])->name('requests.show');
+    Route::post('/requests/{labTest}/process', [App\Http\Controllers\LabPortalController::class, 'process'])->name('process');
+    Route::post('/requests/{labTest}/update', [App\Http\Controllers\LabPortalController::class, 'update'])->name('update');
+    Route::get('/requests/{id}/print', [App\Http\Controllers\LabPortalController::class, 'print'])->name('requests.print');
+    
+    // Route::get('/results', function() { return 'Results'; })->name('results.index'); // Handled by requests.index with filter
+    Route::get('/reports', [App\Http\Controllers\LabPortalController::class, 'reports'])->name('reports.index');
+});
+
+// Staff Portal Routes (Front Desk)
+Route::middleware(['auth', 'portal:staff'])->prefix('staff')->name('staff.portal.')->group(function () {
+    Route::get('/', [App\Http\Controllers\StaffPortalController::class, 'dashboard'])->name('dashboard');
+    
+    // Patient Management
+    Route::get('/patients', [App\Http\Controllers\StaffPortalController::class, 'index'])->name('patients.index');
+    Route::get('/patients/register', [App\Http\Controllers\StaffPortalController::class, 'createPatient'])->name('patients.create');
+    Route::post('/patients/register', [App\Http\Controllers\StaffPortalController::class, 'storePatient'])->name('patients.store');
+    
+    Route::get('/patients/{patient}', [App\Http\Controllers\StaffPortalController::class, 'show'])->name('patients.show');
+    Route::get('/patients/{patient}/edit', [App\Http\Controllers\StaffPortalController::class, 'edit'])->name('patients.edit');
+    Route::post('/patients/{patient}/edit', [App\Http\Controllers\StaffPortalController::class, 'update'])->name('patients.update');
+    Route::post('/patients/{patient}/reset-password', [App\Http\Controllers\StaffPortalController::class, 'resetPassword'])->name('patients.reset-password');
+    
+    Route::get('/patients/{patient}/card', [App\Http\Controllers\StaffPortalController::class, 'printCard'])->name('patients.card');
+    
+    // Appointment Booking
+    Route::get('/patients/{patient}/book-appointment', [App\Http\Controllers\StaffPortalController::class, 'createAppointment'])->name('appointments.create');
+    Route::post('/patients/{patient}/book-appointment', [App\Http\Controllers\StaffPortalController::class, 'storeAppointment'])->name('appointments.store');
 });

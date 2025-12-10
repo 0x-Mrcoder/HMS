@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pharmacy.prescriptions.index') }}">
+                        <a class="nav-link" href="{{ route('admin.pharmacy.prescriptions.index') }}">
                             <i class="iconoir-pill menu-icon"></i>
                             <span>Pharmacy</span>
                         </a>

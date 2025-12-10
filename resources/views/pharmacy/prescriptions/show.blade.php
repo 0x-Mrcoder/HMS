@@ -84,16 +84,46 @@
                     @if($prescription->status === 'pending')
                         <form action="{{ route('pharmacy.portal.dispense', $prescription) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-primary w-100 py-2" 
-                                {{ ($stock < $prescription->quantity || $prescription->visit->patient->wallet->balance < ($price * $prescription->quantity)) ? 'disabled' : '' }}>
-                                <i class="iconoir-check-circle me-1"></i> Confirm Dispense & Deduct Payment
-                            </button>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary py-2" 
+                                    {{ ($stock < $prescription->quantity || $prescription->visit->patient->wallet->balance < ($price * $prescription->quantity)) ? 'disabled' : '' }}>
+                                    <i class="iconoir-check-circle me-1"></i> Confirm Dispense & Deduct Payment
+                                </button>
+                                <button type="button" class="btn btn-outline-danger py-2" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                    <i class="iconoir-cancel me-1"></i> Reject Prescription
+                                </button>
+                            </div>
                             @if($stock < $prescription->quantity)
                                 <small class="text-danger d-block text-center mt-2">Insufficient Stock</small>
                             @elseif($prescription->visit->patient->wallet->balance < ($price * $prescription->quantity))
                                 <small class="text-danger d-block text-center mt-2">Insufficient Wallet Balance</small>
                             @endif
                         </form>
+
+                        <!-- Reject Modal -->
+                        <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Reject Prescription</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ route('pharmacy.portal.prescriptions.reject', $prescription) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Reason for Rejection</label>
+                                                <textarea class="form-control" name="rejection_reason" rows="3" required placeholder="e.g. Out of stock, Incorrect dosage..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @else
                         <div class="alert alert-success text-center">
                             <i class="iconoir-check-circle fs-4 d-block mb-1"></i>

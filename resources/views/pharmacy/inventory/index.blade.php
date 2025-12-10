@@ -3,14 +3,22 @@
 
     <div class="card">
         <div class="card-header">
-            <div class="row align-items-center">
-                <div class="col">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-4">
                     <h4 class="card-title">Drug Inventory</h4>
                 </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDrugModal">
-                        <i class="iconoir-plus-circle me-1"></i> Add New Drug
-                    </button>
+                <div class="col-md-8 text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                        <form action="{{ route('pharmacy.portal.inventory') }}" method="GET" class="d-flex" style="max-width: 300px;">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Search Drug Name..." value="{{ request('search') }}">
+                                <button class="btn btn-soft-secondary" type="submit"><i class="iconoir-search"></i></button>
+                            </div>
+                        </form>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDrugModal">
+                            <i class="iconoir-plus-circle me-1"></i> Add New Drug
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -22,6 +30,7 @@
                             <th>Drug Name</th>
                             <th>Price (₦)</th>
                             <th>Current Stock</th>
+                            <th>Expiry Date</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -37,10 +46,21 @@
                                     </span>
                                 </td>
                                 <td>
+                                    @if($drug->expiry_date)
+                                        <span class="{{ $drug->expiry_date->isPast() ? 'text-danger fw-bold' : ($drug->expiry_date->diffInDays(now()) < 30 ? 'text-warning fw-bold' : '') }}">
+                                            {{ $drug->expiry_date->format('M d, Y') }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
                                     @if($drug->stock == 0)
                                         <span class="badge bg-danger-subtle text-danger">Out of Stock</span>
                                     @elseif($drug->stock < 10)
                                         <span class="badge bg-warning-subtle text-warning">Low Stock</span>
+                                    @elseif($drug->expiry_date && $drug->expiry_date->isPast())
+                                        <span class="badge bg-danger-subtle text-danger">Expired</span>
                                     @else
                                         <span class="badge bg-success-subtle text-success">In Stock</span>
                                     @endif
@@ -51,6 +71,9 @@
                                         data-bs-target="#editDrugModal{{ $drug->id }}">
                                         Edit
                                     </button>
+                                    <a href="{{ route('pharmacy.portal.inventory.logs', $drug) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="iconoir-clock"></i> History
+                                    </a>
 
                                     <!-- Edit Drug Modal -->
                                     <div class="modal fade" id="editDrugModal{{ $drug->id }}" tabindex="-1" aria-hidden="true">
@@ -71,6 +94,10 @@
                                                             <label class="form-label">Stock Level</label>
                                                             <input type="number" class="form-control" name="stock" value="{{ $drug->stock }}" min="0" required>
                                                         </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Expiry Date</label>
+                                                            <input type="date" class="form-control" name="expiry_date" value="{{ $drug->expiry_date?->format('Y-m-d') }}">
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -83,7 +110,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center py-4 text-muted">No drugs found in inventory.</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No drugs found in inventory.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -116,6 +143,10 @@
                         <div class="mb-3">
                             <label class="form-label">Initial Stock</label>
                             <input type="number" class="form-control" name="stock" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" name="expiry_date">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description (Optional)</label>

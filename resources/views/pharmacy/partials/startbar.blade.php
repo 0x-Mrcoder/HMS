@@ -34,6 +34,12 @@
                             <span>Inventory</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('pharmacy.portal.reports.*') ? 'active' : '' }}" href="{{ route('pharmacy.portal.reports.index') }}">
+                            <i class="iconoir-reports menu-icon"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

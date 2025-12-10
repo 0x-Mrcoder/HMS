@@ -61,5 +61,11 @@ return [
             'icon' => 'iconoir-user-badge',
             'accent' => 'success',
         ],
+        'staff' => [
+            'label' => 'Front Desk Staff',
+            'tagline' => 'Patient registration and card printing.',
+            'icon' => 'iconoir-user-square',
+            'accent' => 'primary',
+        ],
     ],
 ];
