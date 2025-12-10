@@ -8,8 +8,8 @@
     $hospitalName = $hospitalConfig['name'] ?? 'Hospital';
     $hospitalLogo = $hospitalConfig['logo_path'] ? asset($hospitalConfig['logo_path']) : asset('rizz-assets/images/logo-sm.png');
 @endphp
-<div class="container-xxl">
     @if($isAdminPortal)
+    <div class="container-xxl">
         <div class="row vh-100 align-items-center">
             <div class="col-12">
                 <div class="card shadow-lg border-0">
@@ -69,7 +69,9 @@
                 </div>
             </div>
         </div>
+    </div>
     @elseif($portal === 'patient')
+    <div class="container-xxl">
         @php
             $primary = $hospitalConfig['primary_color'] ?? '#ef4444';
             $secondary = $hospitalConfig['secondary_color'] ?? '#0f172a';
@@ -145,78 +147,84 @@
                 </div>
             </div>
         </div>
+    </div>
     @else
-        <div class="row vh-100 d-flex justify-content-center">
-            <div class="col-12 align-self-center">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-4 mx-auto">
-                            <div class="card">
-                                <div class="card-body p-0 bg-black auth-header-box rounded-top">
-                                    <div class="text-center p-3">
-                                        <a href="{{ route('dashboard') }}" class="logo logo-admin">
-                                            <img src="{{ $hospitalLogo }}" height="50" alt="logo" class="auth-logo">
-                                        </a>
-                                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-{{ $portalConfig['accent'] ?? 'primary' }}-subtle text-{{ $portalConfig['accent'] ?? 'primary' }} mb-2" style="width:56px;height:56px;">
-                                            <i class="{{ $portalConfig['icon'] ?? 'iconoir-shield' }} fs-24"></i>
-                                        </div>
-                                        <h4 class="mt-2 mb-1 fw-semibold text-white fs-18">{{ $portalConfig['label'] }}</h4>
-                                        <p class="text-muted fw-medium mb-0">{{ $portalConfig['tagline'] }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-body pt-0">
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul class="mb-0">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
-                                    <div class="alert alert-info border-info d-flex align-items-center gap-2">
-                                        <i class="bi bi-info-circle fs-4"></i>
-                                        <span>Demo credentials: <strong>{{ $portal }}@hms.com</strong> / <strong>123456</strong></span>
-                                    </div>
-                                    <form class="my-4" method="POST" action="{{ route('portal.login.' . $portal . '.store') }}">
-                                        @csrf
-                                        <div class="form-group mb-2">
-                                            <label class="form-label" for="username">Email address</label>
-                                            <input type="email" class="form-control" id="username" name="email" value="{{ old('email') }}" placeholder="Enter email" required autofocus>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label" for="userpassword">Password</label>
-                                            <input type="password" class="form-control" name="password" id="userpassword" placeholder="Enter password" required>
-                                        </div>
-                                        <div class="form-group row mt-3">
-                                            <div class="col-sm-6">
-                                                <div class="form-check form-switch form-switch-success">
-                                                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                                                    <label class="form-check-label" for="remember">Remember me</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6 text-end">
-                                                <a href="javascript:void(0);" class="text-muted font-13"><i class="dripicons-lock"></i> Forgot password?</a>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-0 row">
-                                            <div class="col-12">
-                                                <div class="d-grid mt-3">
-                                                    <button class="btn btn-primary" type="submit">Log In <i class="fas fa-sign-in-alt ms-1"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <div class="text-center mb-2">
-                                        <p class="text-muted mb-0">All {{ $hospitalConfig['name'] ?? 'hospital' }} portals share the same credentials format.</p>
-                                    </div>
-                                </div>
-                            </div>
+    <div class="container-fluid p-0">
+        <div class="row g-0 vh-100">
+            <!-- Left Side: Brand/Welcome -->
+            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center position-relative overflow-hidden">
+                 <!-- Background Image with Parallax Effect -->
+                 <div class="position-absolute w-100 h-100" style="background-image: url('{{ asset('rizz-assets/images/auth-bg.jpg') }}'); background-size: cover; background-position: center; z-index: -2;"></div>
+                 
+                 <!-- Colored Overlay - Using strict CSS Variable for Color Matching -->
+                 <div class="position-absolute w-100 h-100" style="background: linear-gradient(135deg, var(--bs-{{ $portalConfig['accent'] ?? 'primary' }}) 0%, #000000 100%); opacity: 0.85; z-index: -1;"></div>
+                 
+                 <!-- Decorative Pattern -->
+                 <div class="position-absolute w-100 h-100" style="background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3; z-index: -1;"></div>
+
+                 <div class="text-center z-1 text-white p-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow-lg" style="width:100px;height:100px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+                        <i class="{{ $portalConfig['icon'] ?? 'iconoir-shield' }} fs-48"></i>
+                    </div>
+                    <h1 class="fw-bold display-5 mb-3">{{ $portalConfig['label'] }} Portal</h1>
+                    <p class="lead text-white-50 fs-18" style="max-width: 400px; margin: 0 auto;">{{ $portalConfig['tagline'] ?? 'Secure access to your dashboard.' }}</p>
+                 </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="col-lg-6 d-flex justify-content-center align-items-center bg-white">
+                <div class="card-body p-5" style="max-width: 500px; width: 100%;">
+                    <div class="mb-5">
+                        <a href="{{ route('home') }}" class="d-block mb-4">
+                            <img src="{{ $hospitalLogo }}" alt="logo" height="40">
+                        </a>
+                        <h3 class="fw-bold mb-1">Welcome Back!</h3>
+                        <p class="text-muted">Sign in to continue to {{ $hospitalName }}.</p>
+                    </div>
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger mb-4">
+                            <ul class="mb-0 ps-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
+                    @endif
+
+                    <form action="{{ route('portal.login.' . $portal . '.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" class="form-control form-control-lg" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <label class="form-label" for="password">Password</label>
+                                <a href="javascript:void(0);" class="text-muted small">Forgot password?</a>
+                            </div>
+                            <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-{{ $portalConfig['accent'] ?? 'primary' }} btn-lg fw-medium" type="submit">
+                                Log In
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-5 text-center">
+                        <p class="text-muted mb-0">© {{ date('Y') }} {{ $hospitalName }}. <br><span class="small">Design & Develop by Rizz</span></p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     @endif
-</div>
 @endsection

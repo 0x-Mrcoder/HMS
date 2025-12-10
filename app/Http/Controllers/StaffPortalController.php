@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Visit;
+
 class StaffPortalController extends Controller
 {
     public function index(Request $request)
@@ -30,19 +32,65 @@ class StaffPortalController extends Controller
         return view('staff.patients.index', compact('patients'));
     }
 
+    public function appointments(Request $request)
+    {
+        $query = Visit::with(['patient', 'doctor'])
+            ->whereNotNull('doctor_id')
+            ->latest('scheduled_at');
+
+        // Filter by Date
+        if ($request->filled('date')) {
+            $query->whereDate('scheduled_at', $request->date);
+        } else {
+            // Default to upcoming/today if no specific filter? 
+            // Or just show all? Let's show all but ordered.
+        }
+
+        // Filter by Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $appointments = $query->paginate(20);
+        $doctors = User::where('role', 'doctor')->get();
+
+        return view('staff.appointments.index', compact('appointments', 'doctors'));
+    }
+
     public function dashboard()
     {
+        // Metric: Total Patients
+        $totalPatients = Patient::count();
+
         // Metric: Patients Registered Today
-        $registeredToday = User::where('role', 'patient')
-            ->whereDate('created_at', today())
-            ->count();
+        $registeredToday = Patient::whereDate('created_at', today())->count();
+            
+        // Metric: Doctors Count
+        $doctorsCount = User::where('role', 'doctor')->count();
+
+        // Metric: Pending Appointments
+        $pendingAppointments = Visit::where('status', 'pending_doctor')->count();
 
         $recentPatients = User::where('role', 'patient')
             ->latest()
             ->take(5)
             ->get();
+            
+        // Today's Appointments
+        $todayAppointments = Visit::with(['patient', 'doctor'])
+            ->whereDate('scheduled_at', today())
+            ->whereNotNull('doctor_id')
+            ->orderBy('scheduled_at')
+            ->get();
 
-        return view('staff.dashboard', compact('registeredToday', 'recentPatients'));
+        return view('staff.dashboard', compact(
+            'totalPatients', 
+            'registeredToday', 
+            'doctorsCount', 
+            'pendingAppointments',
+            'recentPatients', 
+            'todayAppointments'
+        ));
     }
 
     public function createPatient()
@@ -153,6 +201,23 @@ class StaffPortalController extends Controller
         ]);
     }
 
+    public function findPatientForBooking(Request $request)
+    {
+        $patients = collect();
+        
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $patients = Patient::with('user')
+                ->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('hospital_id', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
+                ->get();
+        }
+
+        return view('staff.appointments.find', compact('patients'));
+    }
+
     public function createAppointment(Patient $patient)
     {
         $doctors = User::where('role', 'doctor')->get();
@@ -168,10 +233,13 @@ class StaffPortalController extends Controller
             'scheduled_at' => 'nullable|date',
         ]);
 
+        $doctor = User::findOrFail($validated['doctor_id']);
+
         // Create Pending Visit
         $patient->visits()->create([
-            'doctor_id' => $validated['doctor_id'],
-            'status' => 'pending_doctor', // Use a standard status
+            'doctor_id' => $doctor->id,
+            'department_id' => $doctor->department_id, // Assign Doctor's Department
+            'status' => 'pending_doctor', 
             'visit_type' => $validated['visit_type'],
             'reason' => $validated['reason'],
             'scheduled_at' => $validated['scheduled_at'] ?? now(),

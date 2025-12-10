@@ -25,7 +25,19 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.patients.index') ? 'active' : '' }}" href="{{ route('staff.portal.patients.index') }}">
                             <i class="iconoir-group menu-icon"></i>
-                            <span>All Patients</span>
+                            <span>Manage Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('staff.portal.appointments.index') ? 'active' : '' }}" href="{{ route('staff.portal.appointments.index') }}">
+                            <i class="iconoir-calendar menu-icon"></i>
+                            <span>Schedule</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('staff.portal.appointments.new') ? 'active' : '' }}" href="{{ route('staff.portal.appointments.new') }}">
+                            <i class="iconoir-plus-square menu-icon"></i>
+                            <span>New Booking</span>
                         </a>
                     </li>
                     <li class="nav-item">

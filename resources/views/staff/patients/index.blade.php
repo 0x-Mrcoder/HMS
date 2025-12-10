@@ -1,6 +1,6 @@
 @extends('layouts.staff')
 
-@section('title', 'Patient Directory')
+@section('title', 'Manage Patients')
 
 @section('content')
 <div class="container-xxl">
@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h4 class="card-title">Patient Directory</h4>
+                            <h4 class="card-title">Manage Patients</h4>
                         </div>
                         <div class="col-auto">
                             <form action="{{ route('staff.portal.patients.index') }}" method="GET" class="d-flex gap-2">

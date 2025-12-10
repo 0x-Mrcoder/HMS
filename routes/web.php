@@ -20,8 +20,12 @@ use App\Http\Controllers\VisitController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
 Route::middleware('auth')->group(function () {
-    Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('patients', PatientController::class)->only(['index', 'create', 'store', 'show']);
 
@@ -196,6 +200,8 @@ Route::middleware(['auth', 'portal:staff'])->prefix('staff')->name('staff.portal
     Route::get('/patients/{patient}/card', [App\Http\Controllers\StaffPortalController::class, 'printCard'])->name('patients.card');
     
     // Appointment Booking
+    Route::get('/appointments', [App\Http\Controllers\StaffPortalController::class, 'appointments'])->name('appointments.index');
+    Route::get('/appointments/new', [App\Http\Controllers\StaffPortalController::class, 'findPatientForBooking'])->name('appointments.new');
     Route::get('/patients/{patient}/book-appointment', [App\Http\Controllers\StaffPortalController::class, 'createAppointment'])->name('appointments.create');
     Route::post('/patients/{patient}/book-appointment', [App\Http\Controllers\StaffPortalController::class, 'storeAppointment'])->name('appointments.store');
 });
