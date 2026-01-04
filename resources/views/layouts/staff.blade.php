@@ -16,6 +16,30 @@
     <link href="{{ asset('rizz-assets/css/app.min.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@7.7.0/css/iconoir.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
+    <script>
+        // Check for saved theme preference on load
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+            document.documentElement.setAttribute('data-bs-theme', storedTheme);
+        }
+
+        // Observer to save changes whenever the theme attribute gets updated by the template's existing JS
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
+                    const newTheme = document.documentElement.getAttribute('data-bs-theme');
+                    localStorage.setItem('theme', newTheme);
+                }
+            });
+        });
+
+        // Start observing the HTML element for attribute changes
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-bs-theme']
+        });
+    </script>
     @stack('styles')
 </head>
 

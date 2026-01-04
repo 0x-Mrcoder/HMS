@@ -18,40 +18,97 @@ class DoctorPortalController extends Controller
         $today = now()->startOfDay();
 
         $visits = Visit::with(['patient', 'department', 'service'])
+            ->where('doctor_id', Auth::id())
             ->orderByDesc('scheduled_at')
             ->limit(8)
             ->get();
 
         $activeQueue = Visit::with(['patient', 'department'])
-            ->whereIn('status', ['pending', 'in_progress'])
+            ->where('doctor_id', Auth::id())
+            ->whereIn('status', ['pending_doctor', 'in_progress'])
             ->orderBy('scheduled_at')
             ->limit(5)
             ->get();
 
-        $pendingPrescriptions = Prescription::with(['visit.patient'])
+        $pendingPrescriptions = Prescription::whereHas('visit', fn($q) => $q->where('doctor_id', Auth::id()))
             ->where('status', 'pending')
             ->latest()
             ->limit(6)
             ->get();
 
         $recentLabTests = LabTest::with(['visit.patient'])
+            ->whereHas('visit', fn($q) => $q->where('doctor_id', Auth::id()))
             ->latest()
             ->limit(5)
             ->get();
 
         $metrics = [
-            'today_appointments' => Visit::whereDate('scheduled_at', $today)->count(),
-            'active_patients' => Visit::whereIn('status', ['pending', 'in_progress'])->distinct('patient_id')->count(),
-            'pending_prescriptions' => $pendingPrescriptions->count(),
-            'pending_labs' => LabTest::where('status', 'pending')->count(),
+            'today_appointments' => Visit::where('doctor_id', Auth::id())->whereDate('scheduled_at', $today)->count(),
+            'active_patients' => Visit::where('doctor_id', Auth::id())->whereIn('status', ['pending_doctor', 'in_progress'])->count(),
+            'pending_prescriptions' => $pendingPrescriptions->count(), // Already filtered above? No, let's filter it properly
+            'pending_labs' => LabTest::whereHas('visit', fn($q) => $q->where('doctor_id', Auth::id()))->where('status', 'pending')->count(),
         ];
+
+        $doctor = \App\Models\Doctor::with('department')->where('user_id', Auth::id())->first();
+        $deptName = $doctor?->department?->name;
+
+        $isSurgeon = $deptName === 'Surgery';
+        // Specialists who do Ward Rounds
+        $isWardDoctor = in_array($deptName, ['Cardiology', 'Neurology', 'Internal Medicine', 'Surgery']);
+
+        $upcomingSurgeries = [];
+        $surgeriesToday = [];
+        $preOpQueue = [];
+        $postOpPatients = [];
+
+        if ($isSurgeon) {
+            $surgeriesToday = \App\Models\Surgery::with(['patient'])
+                ->whereDate('scheduled_at', $today)
+                ->where('status', 'scheduled')
+                ->get();
+                
+            $preOpQueue = \App\Models\Surgery::with(['patient'])
+                ->whereIn('status', ['scheduled', 'pending']) 
+                ->orderBy('scheduled_at')
+                ->limit(10)
+                ->get();
+
+             $postOpPatients = \App\Models\Surgery::with(['patient'])
+                ->where('status', 'completed')
+                ->latest('scheduled_at')
+                ->limit(5)
+                ->get();
+            
+            // Re-purpose upcomingSurgeries for the view linkage
+            $upcomingSurgeries = $preOpQueue;
+            
+            $metrics['surgeries_today'] = $surgeriesToday->count();
+            $metrics['pending_requests'] = $preOpQueue->count();
+            $metrics['post_op_active'] = $postOpPatients->count();
+        }
+
+        $myAdmissions = [];
+        if ($isWardDoctor) {
+            $myAdmissions = \App\Models\Admission::with(['patient', 'ward', 'bed'])
+                ->whereHas('visit', fn($q) => $q->where('doctor_id', Auth::id()))
+                ->where('status', 'admitted')
+                ->latest('admitted_at')
+                ->limit(5)
+                ->get();
+        }
 
         return view('doctor.dashboard', compact(
             'metrics',
             'visits',
             'activeQueue',
             'pendingPrescriptions',
-            'recentLabTests'
+            'recentLabTests',
+            'isSurgeon',
+            'upcomingSurgeries',
+            'surgeriesToday',
+            'postOpPatients',
+            'isWardDoctor',
+            'myAdmissions'
         ));
     }
 
@@ -75,7 +132,15 @@ class DoctorPortalController extends Controller
 
     public function showPatient(Patient $patient)
     {
-        $patient->load(['wallet', 'visits' => fn($q) => $q->latest()->limit(10)]);
+        $patient->load([
+            'wallet', 
+            'visits' => fn($q) => $q->latest()->limit(50),
+            'visits.department', // Eager load department for display
+            'admissions.ward',
+            'admissions.bed',
+            'surgeries',
+            'referrals'
+        ]);
         
         return view('doctor.patients.show', compact('patient'));
     }
@@ -327,13 +392,54 @@ class DoctorPortalController extends Controller
         return view('doctor.nursing-notes', compact('notes'));
     }
 
-    public function theatreRequests()
+    public function theatreRequests(\Illuminate\Http\Request $request)
     {
-        // "Theatre Requests" - Surgeries
-        $surgeries = \App\Models\Surgery::with(['patient', 'visit'])
-            ->latest('scheduled_at')
-            ->paginate(20);
+        $query = \App\Models\Surgery::with(['patient']);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->whereHas('patient', function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('hospital_id', 'like', "%{$search}%");
+            });
+        }
+
+        $surgeries = $query->orderBy('scheduled_at', 'desc')
+            ->paginate(10);
 
         return view('doctor.theatre-requests', compact('surgeries'));
+    }
+
+    public function manageSurgery(\App\Models\Surgery $surgery)
+    {
+        // Ensure only surgeons or relevant doctors can access
+        // Ideally check department, but for now simple View return
+        $surgery->load(['patient', 'visit.labTests', 'visit.prescriptions']);
+        return view('doctor.surgeries.manage', compact('surgery'));
+    }
+
+    public function updateSurgeryNotes(\Illuminate\Http\Request $request, \App\Models\Surgery $surgery)
+    {
+        $surgery->update([
+            'notes' => $request->notes,
+            // 'anesthesia_notes' => $request->anesthesia_notes 
+        ]);
+        return back()->with('success', 'Notes updated.');
+    }
+
+    public function completeSurgery(\App\Models\Surgery $surgery)
+    {
+        $surgery->update([
+            'status' => 'completed',
+            'ended_at' => now(),
+        ]);
+        return redirect()->route('doctor.portal.dashboard')->with('success', 'Surgery completed successfully.');
+    }
+
+    public function printSurgeryReport(\App\Models\Surgery $surgery)
+    {
+        $surgery->load(['patient', 'visit']);
+        return view('doctor.surgeries.print', compact('surgery'));
     }
 }

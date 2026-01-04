@@ -27,7 +27,16 @@
                                         </td>
                                         <td>{{ $visit->department?->name }}</td>
                                         <td>
-                                            <span class="badge bg-secondary-subtle text-capitalize">{{ str_replace('_', ' ', $visit->status) }}</span>
+                                            @php
+                                                $badgeClass = match($visit->status) {
+                                                    'completed', 'paid' => 'bg-success-subtle text-success',
+                                                    'in_progress', 'admitted' => 'bg-info-subtle text-info',
+                                                    'pending_doctor' => 'bg-warning-subtle text-warning',
+                                                    'cancelled' => 'bg-danger-subtle text-danger',
+                                                    default => 'bg-secondary-subtle text-secondary'
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $badgeClass }} text-capitalize">{{ str_replace('_', ' ', $visit->status) }}</span>
                                         </td>
                                         <td>
                                             <a href="{{ route('doctor.portal.visits.show', $visit) }}" class="btn btn-sm btn-soft-primary">

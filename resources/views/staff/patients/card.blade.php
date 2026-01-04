@@ -46,59 +46,61 @@
                         <p class="text-muted small">Generated on {{ now()->format('F d, Y h:i A') }}</p>
                     </div>
 
-                    <!-- Main ID & QR -->
-                    <div class="row align-items-center mb-5 border-bottom pb-5">
-                        <div class="col-8">
-                            <h6 class="text-uppercase text-muted letter-spacing-1 mb-1">Hospital ID</h6>
-                            <h1 class="display-4 fw-bold text-primary mb-0">{{ $patient->hospital_id }}</h1>
-                        </div>
-                        <div class="col-4 text-end">
-                            <!-- JS Generated QR Code Container -->
-                            <div id="qrcode" class="d-inline-block border p-2 rounded"></div>
+                    <!-- Main ID & QR Enchanced -->
+                    <div class="card bg-primary text-white border-0 shadow-sm mb-5 overflow-hidden position-relative">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <div class="d-flex flex-column text-start">
+                                        <small class="text-white-50 text-uppercase letter-spacing-1 mb-1">Card Number</small>
+                                        <h2 class="display-6 fw-bold mb-0 font-monospace">{{ trim(chunk_split($patient->hospital_id, 4, ' ')) }}</h2>
+                                        <div class="mt-3">
+                                            <span class="badge bg-white text-primary bg-opacity-10 fw-normal pe-3 ps-2 py-1 rounded-pill">
+                                                <i class="bi bi-person-badge-fill me-2"></i>Patient ID
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="bg-white p-2 rounded d-inline-block">
+                                        <div id="qrcode"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Decorator -->
+                            <div class="position-absolute top-0 end-0 opacity-10">
+                                <i class="bi bi-hospital fs-1" style="font-size: 10rem !important; transform: rotate(-15deg) translate(20px, -20px);"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Credentials & Wallet (The "Value" Section) -->
-                    <div class="row g-4 mb-5">
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-3 bg-light border border-dashed">
-                                <h6 class="fw-bold text-danger mb-3">
-                                    <i class="iconoir-lock-key me-2"></i>Login Credentials
+                    <!-- Wallet & Funding (Full Width) -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="p-4 rounded-3 bg-white border border-dashed text-center shadow-sm">
+                                <h6 class="fw-bold text-success text-uppercase letter-spacing-1 mb-4">
+                                    <i class="bi bi-wallet2 me-2"></i>Account Details
                                 </h6>
-                                <div class="mb-2">
-                                    <small class="text-muted d-block uppercase">Portal URL</small>
-                                    <span class="fw-medium font-monospace">http://hospital.com/login</span>
+                                <div class="row g-4 justify-content-center align-items-center">
+                                    <div class="col-md-4 border-end">
+                                        <small class="text-muted d-block uppercase mb-1 fs-11">Account Name</small>
+                                        <span class="fw-bold text-dark d-block text-truncate px-2">{{ $patient->first_name }} {{ $patient->last_name }}</span>
+                                    </div>
+                                    <div class="col-md-4 border-end">
+                                        <small class="text-muted d-block uppercase mb-1 fs-11">Bank Name</small>
+                                        <span class="fw-bold text-dark fs-5">{{ $patient->wallet->bank_name ?? 'FCMB' }}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted d-block uppercase mb-1 fs-11">Virtual Account Number</small>
+                                        <span class="fs-4 fw-bold font-monospace text-primary letter-spacing-1">{{ $patient->wallet->virtual_account_number ?? 'PENDING' }}</span>
+                                    </div>
                                 </div>
-                                <div class="mb-2">
-                                    <small class="text-muted d-block uppercase">Username / Email</small>
-                                    <span class="fw-bold">{{ $patient->email }}</span>
-                                </div>
-                                <div>
-                                    <small class="text-muted d-block uppercase">Password</small>
-                                    @if($password)
-                                        <span class="fs-4 fw-bold font-monospace bg-white px-2 rounded border">{{ $password }}</span>
-                                    @else
-                                        <span class="text-muted fst-italic">Standard Security (Hidden)</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-3 bg-light border border-dashed">
-                                <h6 class="fw-bold text-success mb-3">
-                                    <i class="iconoir-wallet me-2"></i>Wallet & Funding
-                                </h6>
-                                <div class="mb-2">
-                                    <small class="text-muted d-block uppercase">Bank Name</small>
-                                    <span class="fw-bold">{{ $patient->wallet->bank_name ?? 'CyberBank' }}</span>
-                                </div>
-                                <div>
-                                    <small class="text-muted d-block uppercase">Virtual Account Number</small>
-                                    <span class="fs-4 fw-bold font-monospace text-dark">{{ $patient->wallet->virtual_account_number ?? 'PENDING' }}</span>
-                                </div>
-                                <div class="mt-2 text-muted small">
-                                    <i class="iconoir-info-circle me-1"></i> Transfer to this account to fund wallet.
+                                
+                                <div class="mt-4 pt-3 border-top">
+                                    <div class="d-inline-flex align-items-center gap-2 text-muted small">
+                                        <i class="bi bi-info-circle-fill text-success"></i> 
+                                        <span>Use these details to fund your wallet instantly via bank transfer.</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -30,21 +30,52 @@
         <!-- LEFT COLUMN: Clinical Notes & History -->
         <div class="col-lg-7">
             <div class="row g-3">
-                <!-- Nursing Notes / Vitals -->
+                <!-- Triage & Vitals -->
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Nursing Notes & Vitals</h4>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title fw-bold mb-0">Triage & Vitals</h5>
                         </div>
                         <div class="card-body">
-                            @forelse($visit->nursingNotes as $note)
-                                <div class="alert alert-info mb-2" role="alert">
-                                    <p class="mb-1">{{ $note->note }}</p>
-                                    <small class="text-muted">Recorded by {{ $note->nurse_name }} at {{ $note->recorded_at->format('H:i') }}</small>
+                            <!-- Reported Vitals -->
+                            @if(!empty($visit->vitals))
+                            <div class="row g-3 mb-4 text-center">
+                                <div class="col-3 border-end">
+                                    <small class="text-muted d-block uppercase mb-1">Temperature</small>
+                                    <span class="fs-5 fw-bold text-danger">{{ $visit->vitals['temperature'] ?? '--' }}°C</span>
                                 </div>
-                            @empty
-                                <p class="text-muted italic mb-0">No nursing notes recorded for this visit.</p>
-                            @endforelse
+                                <div class="col-3 border-end">
+                                    <small class="text-muted d-block uppercase mb-1">BP</small>
+                                    <span class="fs-5 fw-bold text-dark">{{ $visit->vitals['blood_pressure'] ?? '--' }}</span>
+                                </div>
+                                <div class="col-3 border-end">
+                                    <small class="text-muted d-block uppercase mb-1">Pulse</small>
+                                    <span class="fs-5 fw-bold text-dark">{{ $visit->vitals['pulse_rate'] ?? '--' }} bpm</span>
+                                </div>
+                                <div class="col-3">
+                                    <small class="text-muted d-block uppercase mb-1">Weight</small>
+                                    <span class="fs-5 fw-bold text-dark">{{ $visit->vitals['weight'] ?? '--' }} kg</span>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            <!-- Presenting Complaint -->
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="fw-bold mb-2 text-primary">Reason for Visit</h6>
+                                <p class="mb-0 fs-5">{{ $visit->reason ?? 'No complaints recorded.' }}</p>
+                            </div>
+
+                            @if($visit->nursingNotes->count() > 0)
+                                <div class="mt-3 pt-3 border-top">
+                                    <h6 class="text-muted mb-2">Nursing Notes</h6>
+                                    @foreach($visit->nursingNotes as $note)
+                                        <div class="alert alert-info py-2 mb-2">
+                                            <p class="mb-1">{{ $note->note }}</p>
+                                            <small class="text-muted fs-11">By {{ $note->nurse_name }} at {{ $note->recorded_at->format('H:i') }}</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

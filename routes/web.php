@@ -142,6 +142,12 @@ Route::middleware(['auth', 'portal:doctor'])->prefix('doctor')->name('doctor.por
     Route::get('/labs', [DoctorPortalController::class, 'labs'])->name('labs');
     Route::get('/nursing-notes', [DoctorPortalController::class, 'nursingNotes'])->name('nursing-notes');
     Route::get('/theatre-requests', [DoctorPortalController::class, 'theatreRequests'])->name('theatre-requests');
+    
+    // Surgery Management (Execution)
+    Route::get('/surgeries/{surgery}/manage', [DoctorPortalController::class, 'manageSurgery'])->name('surgeries.manage');
+    Route::post('/surgeries/{surgery}/update-notes', [DoctorPortalController::class, 'updateSurgeryNotes'])->name('surgeries.update-notes');
+    Route::post('/surgeries/{surgery}/complete', [DoctorPortalController::class, 'completeSurgery'])->name('surgeries.complete');
+    Route::get('/surgeries/{surgery}/print', [DoctorPortalController::class, 'printSurgeryReport'])->name('surgeries.print');
 });
 
 Route::middleware(['auth', 'portal:pharmacy'])->prefix('pharmacy')->name('pharmacy.portal.')->group(function () {
@@ -198,6 +204,9 @@ Route::middleware(['auth', 'portal:staff'])->prefix('staff')->name('staff.portal
     Route::post('/patients/{patient}/reset-password', [App\Http\Controllers\StaffPortalController::class, 'resetPassword'])->name('patients.reset-password');
     
     Route::get('/patients/{patient}/card', [App\Http\Controllers\StaffPortalController::class, 'printCard'])->name('patients.card');
+    
+    // Ward & Bed Management
+    Route::get('/wards', [App\Http\Controllers\StaffPortalController::class, 'wards'])->name('wards.index');
     
     // Appointment Booking
     Route::get('/appointments', [App\Http\Controllers\StaffPortalController::class, 'appointments'])->name('appointments.index');

@@ -14,7 +14,7 @@ export default function DashboardLayout() {
                 tabBarStyle: {
                     backgroundColor: theme.colors.surface,
                     borderTopColor: theme.colors.outline,
-                    height: 70, // Increased height for safe area
+                    height: 100, // Increased height for safe area
                     paddingBottom: 10,
                     paddingTop: 5,
                 },

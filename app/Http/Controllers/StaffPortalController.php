@@ -137,11 +137,58 @@ class StaffPortalController extends Controller
         ]);
 
         // Create Wallet
+        $zainpay = new \App\Classes\Zainpay();
+        $zainboxCode = '31317_hLrKOyyV3ld7T4I8MSYw'; // CMS Sandbox
+
+        $virtualAccountData = [
+            'bankType' => 'fcmb', // Default bank type (working in sandbox)
+            'firstName' => $validated['first_name'],
+            'surname' => $validated['last_name'],
+            'email' => $validated['email'] ?? strtolower($hospitalId) . '@hospital.com',
+            'mobileNumber' => $validated['phone'] ?? '08000000000',
+            'dob' => \Carbon\Carbon::parse($validated['date_of_birth'])->format('d-m-Y'),
+            'gender' => $validated['gender'] == 'male' ? 'M' : 'F',
+            'address' => $validated['address'] ?? 'Kano, Nigeria', // Fallback address required by API
+            'title' => $validated['gender'] == 'male' ? 'Mr' : 'Mrs',
+            'state' => 'Kano', // Default state
+            'bvn' => '22222222222', // Test BVN for Sandbox
+            'zainboxCode' => $zainboxCode
+        ];
+
+        $accountResponse = $zainpay->createVirtualAccount($virtualAccountData);
+        
+        $bankName = 'Wema Bank';
+        $accountNumber = Wallet::generateVirtualAccountNumber(); // Fallback
+
+        if (isset($accountResponse['code']) && $accountResponse['code'] == '00') {
+            $bankName = $accountResponse['data']['bankName'];
+            $accountNumber = $accountResponse['data']['accountNumber'];
+        }
+
         $wallet = Wallet::create([
-            'patient_id' => $patient->id, // Correctly link to Patient
+            'patient_id' => $patient->id, 
             'balance' => 0,
-            'virtual_account_number' => Wallet::generateVirtualAccountNumber(), // Use the model helper
+            'bank_name' => $bankName, 
+            'virtual_account_number' => $accountNumber,
             'low_balance_threshold' => 1000,
+        ]);
+
+        // Generate Registration Invoice
+        $registrationFee = 1000;
+        $invoice = \App\Models\Invoice::create([
+            'patient_id' => $patient->id,
+            'invoice_number' => \App\Models\Invoice::generateNumber(),
+            'status' => 'pending', // Unpaid
+            'total_amount' => $registrationFee,
+            'generated_by' => Auth::id(),
+        ]);
+
+        \App\Models\InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'description' => 'Patient Registration Fee',
+            'quantity' => 1,
+            'unit_price' => $registrationFee,
+            'total_price' => $registrationFee,
         ]);
 
         // Redirect to Print Card view with credentials
@@ -220,7 +267,12 @@ class StaffPortalController extends Controller
 
     public function createAppointment(Patient $patient)
     {
-        $doctors = User::where('role', 'doctor')->get();
+        // Fetch Doctors with their User and Department info
+        $doctors = \App\Models\Doctor::with(['user', 'department'])
+            ->where('is_available', true)
+            ->get()
+            ->sortBy('department.name');
+            
         return view('staff.appointments.create', compact('patient', 'doctors'));
     }
 
@@ -231,22 +283,78 @@ class StaffPortalController extends Controller
             'visit_type' => 'required|string',
             'reason' => 'nullable|string',
             'scheduled_at' => 'nullable|date',
+            'vitals' => 'nullable|array',
+            'vitals.temperature' => 'nullable|numeric',
+            'vitals.blood_pressure' => 'nullable|string',
+            'vitals.pulse_rate' => 'nullable|numeric',
+            'vitals.weight' => 'nullable|numeric',
         ]);
 
         $doctor = User::findOrFail($validated['doctor_id']);
+
+        // Calculate Fee (Free Consultation)
+        $consultationFee = 0;
+        
+        // Create Invoice
+        $invoice = \App\Models\Invoice::create([
+            'patient_id' => $patient->id,
+            'invoice_number' => \App\Models\Invoice::generateNumber(),
+            'status' => 'paid', // Free service is always "paid"
+            'total_amount' => $consultationFee,
+            'generated_by' => Auth::id(),
+        ]);
+
+        \App\Models\InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'description' => 'Consultation Fee - ' . ucwords(str_replace('_', ' ', $validated['visit_type'])),
+            'quantity' => 1,
+            'unit_price' => $consultationFee,
+            'total_price' => $consultationFee,
+        ]);
+
+        // Attempt Payment logic (Only if fee > 0)
+        $visitStatus = 'pending_doctor';
+        $paymentStatus = 'Free';
+        
+        if ($consultationFee > 0) {
+            $invoice->update(['status' => 'pending']); // Reset to pending to check balance
+            
+            if ($patient->wallet && $patient->wallet->balance >= $consultationFee) {
+                // Debit Wallet
+                $patient->wallet->decrement('balance', $consultationFee);
+                
+                // Log Transaction
+                \App\Models\WalletTransaction::create([
+                    'wallet_id' => $patient->wallet->id,
+                    'transaction_type' => 'debit',
+                    'amount' => $consultationFee,
+                    'balance_after' => $patient->wallet->balance,
+                    'description' => 'Payment for Invoice #' . $invoice->invoice_number,
+                    'transacted_at' => now(),
+                ]);
+
+                // Update Invoice
+                $invoice->update(['status' => 'paid']);
+                $paymentStatus = 'Paid';
+            } else {
+                 $paymentStatus = 'Unpaid';
+            }
+        }
 
         // Create Pending Visit
         $patient->visits()->create([
             'doctor_id' => $doctor->id,
             'department_id' => $doctor->department_id, // Assign Doctor's Department
-            'status' => 'pending_doctor', 
+            'status' => $visitStatus, 
             'visit_type' => $validated['visit_type'],
             'reason' => $validated['reason'],
             'scheduled_at' => $validated['scheduled_at'] ?? now(),
+            'vitals' => $validated['vitals'] ?? null,
+            // Link invoice if we add invoice_id column to visits later
         ]);
 
         return redirect()->route('staff.portal.patients.show', $patient)
-            ->with('success', 'Appointment booked successfully.');
+            ->with('success', 'Appointment booked. Invoice generated: ' . $invoice->invoice_number . ' (' . $paymentStatus . ')');
     }
 
     public function printCard(Patient $patient, Request $request)
@@ -255,5 +363,19 @@ class StaffPortalController extends Controller
         $password = $request->query('raw_password');
 
         return view('staff.patients.card', compact('patient', 'password'));
+    }
+
+    public function wards()
+    {
+        $wards = \App\Models\Ward::with('beds')->get();
+        
+        $stats = [
+            'total' => \App\Models\Bed::count(),
+            'available' => \App\Models\Bed::where('status', 'available')->count(),
+            'occupied' => \App\Models\Bed::where('status', 'occupied')->count(),
+            'maintenance' => \App\Models\Bed::where('status', 'maintenance')->count(),
+        ];
+
+        return view('staff.wards.index', compact('wards', 'stats'));
     }
 }

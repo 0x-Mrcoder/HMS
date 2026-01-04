@@ -68,4 +68,8 @@ return [
             'accent' => 'primary',
         ],
     ],
+    'zainpay' => [
+        'mode' => env('ZAINPAY_MODE', 'sandbox'),
+        'public_key' => env('ZAINPAY_PUBLIC_KEY', ''),
+    ],
 ];

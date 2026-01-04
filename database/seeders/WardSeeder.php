@@ -26,7 +26,7 @@ class WardSeeder extends Seeder
                 Bed::create([
                     'ward_id' => $ward->id,
                     'number' => strtoupper(substr($ward->type, 0, 1)) . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                    'status' => 'available',
+                    'status' => fake()->randomElement(['available', 'available', 'available', 'occupied', 'maintenance']),
                 ]);
             }
         }

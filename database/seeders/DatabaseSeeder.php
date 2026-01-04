@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             PatientSeeder::class,
             HmsDemoSeeder::class,
+            WardSeeder::class,
         ]);
 
         foreach (config('hms.portals', []) as $slug => $portal) {

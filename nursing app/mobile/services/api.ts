@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 // REPLACE WITH YOUR COMPUTER'S LOCAL IP ADDRESS if running on physical device
 // For Android Emulator use '10.0.2.2'
 // For iOS Simulator use 'localhost'
-const API_URL = 'http://10.36.225.156:8000/api/nursing';
+const API_URL = 'http://10.0.2.2:8000/api/nursing';
 
 const api = axios.create({
     baseURL: API_URL,

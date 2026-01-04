@@ -102,8 +102,96 @@
                 </div>
             </div>
 
+            <!-- Invoices History -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Invoices</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse(\App\Models\Invoice::where('patient_id', $patient->id)->latest()->take(5)->get() as $inv)
+                                    <tr>
+                                        <td class="fw-medium text-primary">{{ $inv->invoice_number }}</td>
+                                        <td class="small">{{ $inv->created_at->format('M d, H:i') }}</td>
+                                        <td class="fw-bold">₦{{ number_format($inv->total_amount, 2) }}</td>
+                                        <td>
+                                            @if($inv->status == 'paid')
+                                                <span class="badge bg-success-subtle text-success">Paid</span>
+                                            @elseif($inv->status == 'pending')
+                                                <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                            @else
+                                                <span class="badge bg-danger-subtle text-danger">{{ ucfirst($inv->status) }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-light" onclick="alert('Print functionality coming soon for {{ $inv->invoice_number }}')">
+                                                <i class="iconoir-printer"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="5" class="text-center text-muted py-3">No invoices generated yet.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Transactions (Brief) -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title">Wallet Transactions</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($patient->wallet->transactions()->latest()->take(5)->get() as $txn)
+                                    <tr>
+                                        <td class="small">{{ $txn->transacted_at->format('M d, H:i') }}</td>
+                                        <td class="small">{{ $txn->description }}</td>
+                                        <td>
+                                            @if($txn->transaction_type == 'credit')
+                                                <span class="badge bg-success-subtle text-success">Credit</span>
+                                            @else
+                                                <span class="badge bg-danger-subtle text-danger">Debit</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end font-monospace fw-bold {{ $txn->transaction_type == 'credit' ? 'text-success' : 'text-danger' }}">
+                                            {{ $txn->transaction_type == 'credit' ? '+' : '-' }}₦{{ number_format($txn->amount, 2) }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted">No transactions found.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Visit History (Brief) -->
-            <div class="card">
+            <div class="card mt-4">
                 <div class="card-header">
                     <h5 class="card-title">Recent Visits</h5>
                 </div>

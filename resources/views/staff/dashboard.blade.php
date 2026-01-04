@@ -3,25 +3,29 @@
 @section('title', 'Dashboard')
 
 @section('content')
-@extends('layouts.staff')
-
-@section('title', 'Dashboard')
-
-@section('content')
-<div class="container-xxl">
+<style>
+    .card-animate {
+        transition: all 0.3s ease;
+    }
+    .card-animate:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+<div class="container-xxl pt-1 mt-1">
     
     <!-- Welcome Header -->
     <div class="row align-items-center mb-4">
         <div class="col-md-6">
-            <h4 class="mb-0">Good {{ now()->hour < 12 ? 'Morning' : (now()->hour < 17 ? 'Afternoon' : 'Evening') }}, Staff</h4>
-            <p class="text-muted mb-0">Here's what's happening at the front desk today.</p>
+            <h4 class="mb-0">Good {{ now()->hour < 12 ? 'Morning' : (now()->hour < 17 ? 'Afternoon' : 'Evening') }}, {{ Auth::user()->first_name ?? 'Staff' }}</h4>
+            <p class="text-muted mb-0">Today is {{ now()->format('l, F jS') }}. Here's what's happening at the front desk.</p>
         </div>
         <div class="col-md-6 text-end">
             <a href="{{ route('staff.portal.patients.create') }}" class="btn btn-primary btn-sm me-2">
-                <i class="iconoir-plus-circle"></i> Register Patient
+                <i class="bi bi-person-plus"></i> Register Patient
             </a>
             <a href="{{ route('staff.portal.appointments.new') }}" class="btn btn-outline-primary btn-sm">
-                <i class="iconoir-calendar-plus"></i> New Booking
+                <i class="bi bi-calendar-plus"></i> New Booking
             </a>
         </div>
     </div>
@@ -30,15 +34,15 @@
     <div class="row">
         <!-- Total Patients -->
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-primary-subtle border-0">
+            <div class="card shadow-sm border-0 h-100 card-animate">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-primary fw-medium mb-1 fs-13">Total Patients</p>
-                            <h3 class="my-0 text-primary fw-bold">{{ $totalPatients }}</h3>
+                            <p class="text-muted fw-medium mb-1 fs-13 text-uppercase">Total Patients</p>
+                            <h3 class="my-0 fw-bold text-dark">{{ $totalPatients }}</h3>
                         </div>
-                        <div class="thumb-md bg-white rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="iconoir-group fs-24 text-primary"></i>
+                        <div class="thumb-md bg-primary-subtle rounded d-flex align-items-center justify-content-center">
+                            <i class="bi bi-people fs-3 text-primary"></i>
                         </div>
                     </div>
                 </div>
@@ -47,15 +51,15 @@
         
         <!-- Patients Today -->
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-success-subtle border-0">
+            <div class="card shadow-sm border-0 h-100 card-animate">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-success fw-medium mb-1 fs-13">Registered Today</p>
-                            <h3 class="my-0 text-success fw-bold">{{ $registeredToday }}</h3>
+                            <p class="text-muted fw-medium mb-1 fs-13 text-uppercase">Registered Today</p>
+                            <h3 class="my-0 fw-bold text-dark">{{ $registeredToday }}</h3>
                         </div>
-                        <div class="thumb-md bg-white rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="iconoir-add-user fs-24 text-success"></i>
+                        <div class="thumb-md bg-success-subtle rounded d-flex align-items-center justify-content-center">
+                            <i class="bi bi-person-add fs-3 text-success"></i>
                         </div>
                     </div>
                 </div>
@@ -64,15 +68,15 @@
 
         <!-- Appointments Today -->
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-warning-subtle border-0">
+            <div class="card shadow-sm border-0 h-100 card-animate">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-warning fw-medium mb-1 fs-13">Appointments Today</p>
-                            <h3 class="my-0 text-warning fw-bold">{{ $todayAppointments->count() }}</h3>
+                            <p class="text-muted fw-medium mb-1 fs-13 text-uppercase">Appointments Today</p>
+                            <h3 class="my-0 fw-bold text-dark">{{ $todayAppointments->count() }}</h3>
                         </div>
-                        <div class="thumb-md bg-white rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="iconoir-calendar fs-24 text-warning"></i>
+                        <div class="thumb-md bg-warning-subtle rounded d-flex align-items-center justify-content-center">
+                            <i class="bi bi-calendar-check fs-3 text-warning"></i>
                         </div>
                     </div>
                 </div>
@@ -81,15 +85,15 @@
 
         <!-- Pending Actions -->
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-info-subtle border-0">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-info fw-medium mb-1 fs-13">Pending Confirm</p>
-                            <h3 class="my-0 text-info fw-bold">{{ $pendingAppointments }}</h3>
+                            <p class="text-muted fw-medium mb-1 fs-13 text-uppercase">Pending Confirm</p>
+                            <h3 class="my-0 fw-bold text-dark">{{ $pendingAppointments }}</h3>
                         </div>
-                        <div class="thumb-md bg-white rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="iconoir-bell-notification fs-24 text-info"></i>
+                        <div class="thumb-md bg-info-subtle rounded d-flex align-items-center justify-content-center">
+                            <i class="bi bi-bell fs-3 text-info"></i>
                         </div>
                     </div>
                 </div>
@@ -98,14 +102,14 @@
     </div>
 
     <!-- Operations Area -->
-    <div class="row mt-3">
+    <div class="row mt-4">
         <!-- Today's Schedule -->
         <div class="col-lg-8">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0 pt-3">
                     <div>
-                        <h4 class="card-title mb-0">Today's Schedule</h4>
-                        <small class="text-muted">Overview of patient visits scheduled for {{ now()->format('M d') }}</small>
+                        <h5 class="card-title mb-0">Today's Schedule</h5>
+                        <p class="text-muted small mb-0">Overview of patient visits scheduled for {{ now()->format('M d') }}</p>
                     </div>
                     <a href="{{ route('staff.portal.appointments.index') }}" class="text-primary fw-medium fs-13">View All</a>
                 </div>
@@ -184,9 +188,9 @@
             <!-- Quick Actions Card (Optional Enhancement) -->
             <!-- <div class="card mb-3 bg-dark text-white ..."> ... </div> -->
 
-            <div class="card h-100">
-                <div class="card-header bg-transparent border-bottom-0">
-                    <h4 class="card-title mb-0">Recent Registrations</h4>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 pt-3">
+                    <h5 class="card-title mb-0">Recent Registrations</h5>
                 </div>
                 <div class="card-body pt-0">
                     <div class="list-group list-group-flush">
@@ -194,7 +198,7 @@
                             <div class="list-group-item px-0 border-0 mb-2">
                                 <div class="d-flex align-items-center">
                                     <div class="thumb-md rounded bg-light d-flex align-items-center justify-content-center me-3">
-                                        <i class="iconoir-user fs-20 text-muted"></i>
+                                        <i class="bi bi-person fs-5 text-muted"></i>
                                     </div>
                                     <div class="flex-grow-1 overflow-hidden">
                                         <h6 class="mb-1 text-truncate fw-medium">{{ $patient->name }}</h6>
@@ -206,7 +210,7 @@
                                     </div>
                                     <div class="flex-shrink-0 ms-2">
                                         <a href="{{ route('staff.portal.patients.card', $patient) }}" class="btn btn-icon btn-sm btn-ghost-primary" title="Print Card">
-                                            <i class="iconoir-printer fs-16"></i>
+                                            <i class="bi bi-printer fs-5"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -216,7 +220,7 @@
                         @endforelse
                     </div>
                     <div class="mt-3 text-center">
-                        <a href="{{ route('staff.portal.patients.index') }}" class="btn btn-sm btn-link text-primary text-decoration-none">View Patient Directory <i class="iconoir-arrow-right fs-12 ms-1"></i></a>
+                        <a href="{{ route('staff.portal.patients.index') }}" class="btn btn-sm btn-link text-primary text-decoration-none">View Patient Directory <i class="bi bi-arrow-right fs-12 ms-1"></i></a>
                     </div>
                 </div>
             </div>

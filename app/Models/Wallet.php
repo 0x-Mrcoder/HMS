@@ -14,6 +14,7 @@ class Wallet extends Model
         'balance',
         'low_balance_threshold',
         'virtual_account_number',
+        'bank_name',
     ];
 
     protected $casts = [

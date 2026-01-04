@@ -18,32 +18,38 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.dashboard') ? 'active' : '' }}" href="{{ route('staff.portal.dashboard') }}">
-                            <i class="iconoir-dashboard menu-icon"></i>
+                            <i class="bi bi-speedometer2 menu-icon"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.patients.index') ? 'active' : '' }}" href="{{ route('staff.portal.patients.index') }}">
-                            <i class="iconoir-group menu-icon"></i>
+                            <i class="bi bi-people menu-icon"></i>
                             <span>Manage Patients</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.appointments.index') ? 'active' : '' }}" href="{{ route('staff.portal.appointments.index') }}">
-                            <i class="iconoir-calendar menu-icon"></i>
+                            <i class="bi bi-calendar-week menu-icon"></i>
                             <span>Schedule</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.appointments.new') ? 'active' : '' }}" href="{{ route('staff.portal.appointments.new') }}">
-                            <i class="iconoir-plus-square menu-icon"></i>
+                            <i class="bi bi-calendar-plus menu-icon"></i>
                             <span>New Booking</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('staff.portal.patients.create') ? 'active' : '' }}" href="{{ route('staff.portal.patients.create') }}">
-                            <i class="iconoir-add-user menu-icon"></i>
+                            <i class="bi bi-person-plus menu-icon"></i>
                             <span>Register New</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('staff.portal.wards.index') ? 'active' : '' }}" href="{{ route('staff.portal.wards.index') }}">
+                            <i class="bi bi-hospital menu-icon"></i>
+                            <span>Wards & Beds</span>
                         </a>
                     </li>
                     <!-- Future: Book Appointment -->

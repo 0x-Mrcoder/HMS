@@ -20,22 +20,29 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.dashboard') ? 'active' : '' }}" href="{{ route('doctor.portal.dashboard') }}">
-                            <i class="iconoir-dashboard menu-icon"></i>
+                            <i class="iconoir-home-simple menu-icon"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    @php
+                        $isSurgeon = \App\Models\Doctor::where('user_id', Auth::id())->first()?->department?->name === 'Surgery';
+                    @endphp
+
+                    @if(!$isSurgeon)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.queue') ? 'active' : '' }}" href="{{ route('doctor.portal.queue') }}">
-                            <i class="iconoir-group menu-icon"></i>
+                            <i class="bi bi-people menu-icon"></i>
                             <span>Clinic Queue</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.appointments') ? 'active' : '' }}" href="{{ route('doctor.portal.appointments') }}">
-                            <i class="iconoir-calendar menu-icon"></i>
+                            <i class="bi bi-calendar-event menu-icon"></i>
                             <span>Appointments</span>
                         </a>
                     </li>
+                    @endif
+
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.patients.*') ? 'active' : '' }}" href="{{ route('doctor.portal.patients.index') }}">
                             <i class="iconoir-user menu-icon"></i>
@@ -44,28 +51,30 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.prescriptions') ? 'active' : '' }}" href="{{ route('doctor.portal.prescriptions') }}">
-                            <i class="iconoir-rx menu-icon"></i>
+                            <i class="bi bi-capsule menu-icon"></i>
                             <span>Prescriptions</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.labs') ? 'active' : '' }}" href="{{ route('doctor.portal.labs') }}">
-                            <i class="iconoir-flask menu-icon"></i>
+                            <i class="bi bi-eyedropper menu-icon"></i>
                             <span>Lab Results</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.nursing-notes') ? 'active' : '' }}" href="{{ route('doctor.portal.nursing-notes') }}">
-                            <i class="iconoir-notes menu-icon"></i>
+                            <i class="bi bi-journal-text menu-icon"></i>
                             <span>Nursing Notes</span>
                         </a>
                     </li>
+                    @if($isSurgeon)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('doctor.portal.theatre-requests') ? 'active' : '' }}" href="{{ route('doctor.portal.theatre-requests') }}">
-                            <i class="iconoir-scissors menu-icon"></i>
-                            <span>Theatre Requests</span>
+                            <i class="bi bi-scissors menu-icon"></i>
+                            <span>Theatre Manager</span>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </div>
         </div>
